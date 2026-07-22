@@ -1,4 +1,4 @@
-import type { ApiResponse, StatsSummary, TopPost, ViewPoint } from '~/types/api'
+import type { ApiResponse, StatsSummary, Tag, TopPost, ViewPoint } from '~/types/api'
 
 export function useStats() {
   const api = useApi()
@@ -6,11 +6,15 @@ export function useStats() {
   const summary = () =>
     api<ApiResponse<StatsSummary>>('/stats/summary')
 
+  // GET /tags — public endpoint served by StatsHandler.Tags
+  const tags = () =>
+    api<ApiResponse<Tag[]>>('/tags')
+
   const views = (params?: { from?: string; to?: string; bucket?: string }) =>
     api<ApiResponse<ViewPoint[]>>('/admin/stats/views', { query: params })
 
   const topPosts = (limit?: number) =>
     api<ApiResponse<TopPost[]>>('/admin/stats/top-posts', { query: { limit } })
 
-  return { summary, views, topPosts }
+  return { summary, tags, views, topPosts }
 }

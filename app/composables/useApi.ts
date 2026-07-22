@@ -4,6 +4,7 @@ export function useApi() {
 
   return $fetch.create({
     baseURL: config.public.apiBase,
+    credentials: 'include',
     onRequest({ options }) {
       if (auth.token) {
         options.headers = { ...options.headers, Authorization: `Bearer ${auth.token}` }
