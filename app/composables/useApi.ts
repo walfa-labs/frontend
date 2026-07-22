@@ -4,7 +4,9 @@ export function useApi() {
 
   return $fetch.create({
     baseURL: config.public.apiBase,
-    credentials: 'include',
+    // credentials: 'include' is only meaningful in the browser (for httpOnly cookies).
+    // On the server (SSR), it causes fetch errors. Set it only on client.
+    credentials: import.meta.client ? 'include' : undefined,
     onRequest({ options }) {
       if (auth.token) {
         options.headers = { ...options.headers, Authorization: `Bearer ${auth.token}` }

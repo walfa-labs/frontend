@@ -39,5 +39,13 @@ export default defineNuxtConfig({
     fallback: 'light',
   },
   devtools: { enabled: true },
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://localhost:8080/api',
+        changeOrigin: true,
+      },
+    },
+  },
   compatibilityDate: '2025-07-15',
 })
