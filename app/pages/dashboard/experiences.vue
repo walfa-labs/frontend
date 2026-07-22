@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Experience } from '~/types/api'
+
 definePageMeta({ layout: 'dashboard' })
 
 const { adminList, adminDelete } = useExperiences()
@@ -6,7 +8,7 @@ const { adminList, adminDelete } = useExperiences()
 const { data, refresh } = await useAsyncData(
   'admin-experiences',
   () => adminList(),
-  { default: () => ({ data: [] }) },
+  { default: () => ({ data: [] as Experience[] }) },
 )
 
 const rows = computed(() => data.value?.data ?? [])
@@ -18,7 +20,7 @@ const columns = [
   { key: 'current', label: 'Status' },
 ]
 
-async function handleDelete(row: Record<string, any>) {
+async function handleDelete(row: Experience) {
   await adminDelete(row.id)
   await refresh()
 }
@@ -27,7 +29,7 @@ async function handleDelete(row: Record<string, any>) {
 <template>
   <div>
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-highlighted">Experience</h1>
+      <h1 class="editorial-heading text-2xl text-[var(--text-primary)]">Experience</h1>
       <UButton icon="lucide:plus" color="primary">Add</UButton>
     </div>
     <DashboardResourceTable

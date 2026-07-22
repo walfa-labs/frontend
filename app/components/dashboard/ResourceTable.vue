@@ -5,32 +5,34 @@ interface Column {
   class?: string
 }
 
+type Row = Record<string, unknown>
+
 const props = defineProps<{
   columns: Column[]
-  rows: Record<string, any>[]
+  rows: Row[]
   loading?: boolean
 }>()
 
 defineEmits<{
-  edit: [row: Record<string, any>]
-  delete: [row: Record<string, any>]
+  edit: [row: Row]
+  delete: [row: Row]
 }>()
 </script>
 
 <template>
-  <div class="rounded-lg border border-default overflow-hidden">
+  <div class="rounded-lg border border-[var(--border-subtle)] overflow-hidden">
     <table class="w-full">
-      <thead class="bg-elevated/50 border-b border-default">
+      <thead class="bg-[var(--surface-subtle)]/50 border-b border-[var(--border-subtle)]">
         <tr>
           <th
             v-for="col in columns"
             :key="col.key"
-            class="px-4 py-3 text-left text-sm font-medium text-muted"
+            class="px-4 py-3 text-left text-sm font-medium text-[var(--text-tertiary)]"
             :class="col.class"
           >
             {{ col.label }}
           </th>
-          <th class="px-4 py-3 text-right text-sm font-medium text-muted w-24">
+          <th class="px-4 py-3 text-right text-sm font-medium text-[var(--text-tertiary)] w-24">
             Actions
           </th>
         </tr>
@@ -39,7 +41,7 @@ defineEmits<{
         <tr
           v-for="(row, i) in rows"
           :key="i"
-          class="border-b border-default last:border-b-0 hover:bg-elevated/30"
+          class="border-b border-[var(--border-subtle)] last:border-b-0 hover:bg-[var(--surface-subtle)]/30"
         >
           <td v-for="col in columns" :key="col.key" class="px-4 py-3 text-sm">
             <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
@@ -66,7 +68,7 @@ defineEmits<{
           </td>
         </tr>
         <tr v-if="!loading && rows.length === 0">
-          <td :colspan="columns.length + 1" class="px-4 py-12 text-center text-muted">
+          <td :colspan="columns.length + 1" class="px-4 py-12 text-center text-[var(--text-tertiary)]">
             No records found.
           </td>
         </tr>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { z } from 'zod'
+import type { PostInput } from '~/types/api'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -30,20 +31,20 @@ async function handleSave() {
   saving.value = true
   errorMsg.value = null
   try {
-    const payload = {
+    const payload: PostInput = {
       title: form.title,
       slug: form.slug,
-      excerpt: form.excerpt || null,
+      excerpt: form.excerpt,
       bodyMarkdown: form.bodyMarkdown,
-      coverImageUrl: form.coverImageUrl || null,
+      coverImageUrl: form.coverImageUrl,
       status: form.status,
-      publishedAt: form.status === 'published' ? new Date().toISOString() : null,
       tags: form.tags.map((name) => ({ name, slug: name.toLowerCase().replace(/\s+/g, '-') })),
     }
     await adminCreate(payload)
     await navigateTo('/dashboard/posts')
-  } catch (err: any) {
-    errorMsg.value = err?.data?.error?.message ?? 'Failed to save post.'
+  } catch (err: unknown) {
+    const error = err as { data?: { error?: { message?: string } } }
+    errorMsg.value = error?.data?.error?.message ?? 'Failed to save post.'
   } finally {
     saving.value = false
   }
@@ -60,7 +61,7 @@ function generateSlug() {
 <template>
   <div>
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-highlighted">New Post</h1>
+      <h1 class="editorial-heading text-2xl text-[var(--text-primary)]">New Post</h1>
       <UButton to="/dashboard/posts" variant="ghost" color="neutral">Cancel</UButton>
     </div>
 
@@ -83,7 +84,7 @@ function generateSlug() {
       </UFormField>
 
       <div>
-        <label class="block text-sm font-medium text-muted mb-2">Content (Markdown)</label>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Content (Markdown)</label>
         <EditorUmoEditor v-model="form.bodyMarkdown" placeholder="Write your post…" />
       </div>
 
@@ -97,7 +98,7 @@ function generateSlug() {
         </UFormField>
       </div>
 
-      <p v-if="errorMsg" class="text-sm text-error">{{ errorMsg }}</p>
+      <p v-if="errorMsg" class="text-sm text-red-500">{{ errorMsg }}</p>
 
       <div class="flex gap-3">
         <UButton type="submit" :loading="saving" color="primary">Create Post</UButton>

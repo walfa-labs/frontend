@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ProjectSummary } from '~/types/api'
+import type { Project } from '~/types/api'
 
 defineProps<{
-  projects: ProjectSummary[]
+  projects: Project[]
 }>()
 </script>
 
@@ -10,7 +10,7 @@ defineProps<{
   <section class="py-16">
     <UContainer>
       <div class="flex items-center justify-between mb-8">
-        <h2 class="text-3xl font-bold text-highlighted">Featured Projects</h2>
+        <h2 class="editorial-heading text-3xl text-[var(--text-primary)]">Featured Projects</h2>
         <UButton to="/projects" variant="link" color="primary">
           View all →
         </UButton>

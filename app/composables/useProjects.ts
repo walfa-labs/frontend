@@ -1,10 +1,11 @@
-import type { ApiResponse, Project, ProjectInput, ProjectSummary } from '~/types/api'
+import type { ApiResponse, Project, ProjectInput } from '~/types/api'
 
 export function useProjects() {
   const api = useApi()
 
+  // Backend returns full Project[] for both public and admin list — no separate summary type.
   const list = (params?: { featured?: boolean }) =>
-    api<ApiResponse<ProjectSummary[]>>('/projects', { query: params })
+    api<ApiResponse<Project[]>>('/projects', { query: params })
 
   const getBySlug = (slug: string) =>
     api<ApiResponse<Project>>(`/projects/${slug}`)
@@ -18,7 +19,7 @@ export function useProjects() {
   const adminCreate = (payload: ProjectInput) =>
     api<ApiResponse<Project>>('/admin/projects', { method: 'POST', body: payload })
 
-  const adminUpdate = (id: string, payload: Partial<ProjectInput>) =>
+  const adminUpdate = (id: string, payload: ProjectInput) =>
     api<ApiResponse<Project>>(`/admin/projects/${id}`, { method: 'PUT', body: payload })
 
   const adminPatch = (id: string, payload: Partial<ProjectInput>) =>

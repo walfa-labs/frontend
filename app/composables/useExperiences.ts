@@ -15,7 +15,7 @@ export function useExperiences() {
   const adminCreate = (payload: ExperienceInput) =>
     api<ApiResponse<Experience>>('/admin/experiences', { method: 'POST', body: payload })
 
-  const adminUpdate = (id: string, payload: Partial<ExperienceInput>) =>
+  const adminUpdate = (id: string, payload: ExperienceInput) =>
     api<ApiResponse<Experience>>(`/admin/experiences/${id}`, { method: 'PUT', body: payload })
 
   const adminPatch = (id: string, payload: Partial<ExperienceInput>) =>

@@ -1,5 +1,5 @@
 // Shared API types — mirror backend DTOs (camelCase wire format).
-// See DESIGN.md §7 for contract examples.
+// Audited against ../backend/internal/adapter/handler/dto.go on 2026-07-23.
 
 // --- Common ---
 
@@ -37,9 +37,10 @@ export interface Tag {
 }
 
 // --- Experience ---
+// Backend ExperienceResponse does NOT include createdAt/updatedAt.
 
 export interface ExperienceHighlight {
-  id?: string
+  id: string
   bodyMarkdown: string
   sortOrder: number
 }
@@ -49,25 +50,33 @@ export interface Experience {
   experienceType: ExperienceType
   organization: string
   roleTitle: string
-  location: string | null
+  location: string
   startDate: string
   endDate: string | null
   current: boolean
   summaryMarkdown: string
-  highlights: ExperienceHighlight[]
   sortOrder: number
-  createdAt: string
-  updatedAt: string
+  highlights: ExperienceHighlight[]
 }
 
-export type ExperienceInput = Omit<Experience, 'id' | 'createdAt' | 'updatedAt'> & {
-  id?: string
+export interface ExperienceInput {
+  experienceType: ExperienceType
+  organization: string
+  roleTitle: string
+  location: string
+  startDate: string
+  endDate: string | null
+  current: boolean
+  summaryMarkdown: string
+  sortOrder: number
+  highlights: Array<{ bodyMarkdown: string; sortOrder: number }>
 }
 
 // --- Project ---
+// Backend ProjectResponse does NOT include createdAt/updatedAt.
 
 export interface ProjectLink {
-  id?: string
+  id: string
   label: string
   url: string
   kind: ProjectLinkKind
@@ -77,70 +86,65 @@ export interface Project {
   id: string
   slug: string
   title: string
-  tagline: string | null
+  tagline: string
   descriptionMarkdown: string
-  coverImageUrl: string | null
-  repoUrl: string | null
-  demoUrl: string | null
+  coverImageUrl: string
+  repoUrl: string
+  demoUrl: string
   techStack: string[]
   links: ProjectLink[]
   status: ContentStatus
   featured: boolean
   sortOrder: number
   publishedAt: string | null
-  createdAt: string
-  updatedAt: string
 }
 
-export interface ProjectSummary {
-  id: string
+export interface ProjectInput {
   slug: string
   title: string
-  tagline: string | null
-  coverImageUrl: string | null
+  tagline: string
+  descriptionMarkdown: string
+  coverImageUrl: string
+  repoUrl: string
+  demoUrl: string
   techStack: string[]
-  featured: boolean
   status: ContentStatus
-}
-
-export type ProjectInput = Omit<Project, 'id' | 'createdAt' | 'updatedAt'> & {
-  id?: string
+  featured: boolean
+  sortOrder: number
+  links: Array<{ label: string; url: string; kind: ProjectLinkKind }>
 }
 
 // --- Blog Post ---
-
-export interface Post {
-  id: string
-  slug: string
-  title: string
-  excerpt: string | null
-  bodyMarkdown: string
-  coverImageUrl: string | null
-  status: ContentStatus
-  viewCount: number
-  publishedAt: string | null
-  tags: Tag[]
-  createdAt: string
-  updatedAt: string
-}
 
 export interface PostSummary {
   id: string
   slug: string
   title: string
-  excerpt: string | null
-  coverImageUrl: string | null
+  excerpt: string
+  coverImageUrl: string
   publishedAt: string | null
   tags: Tag[]
 }
 
-export type PostInput = Omit<Post, 'id' | 'viewCount' | 'createdAt' | 'updatedAt'> & {
-  id?: string
+export interface Post extends PostSummary {
+  bodyMarkdown: string
+  viewCount: number
+}
+
+export interface PostInput {
+  slug: string
+  title: string
+  excerpt: string
+  bodyMarkdown: string
+  coverImageUrl: string
+  status: ContentStatus
+  tags: Array<{ name: string; slug: string }>
 }
 
 // --- Assets ---
 
 export interface Asset {
+  id: string
   key: string
   url: string
   contentType: string
@@ -157,8 +161,9 @@ export interface StatsSummary {
   totalPostViews: number
 }
 
+// Backend sends { bucket, views } — not { date, views }
 export interface ViewPoint {
-  date: string
+  bucket: string
   views: number
 }
 
@@ -166,17 +171,23 @@ export interface TopPost {
   id: string
   slug: string
   title: string
-  viewCount: number
+  views: number
 }
 
 // --- Auth ---
+// Backend loginResponse returns { accessToken, refreshToken }.
+// Backend refreshResponse returns { accessToken }.
 
 export interface LoginPayload {
   username: string
   password: string
 }
 
-export interface AuthTokens {
-  token: string
-  refreshToken?: string
+export interface LoginResponse {
+  accessToken: string
+  refreshToken: string
+}
+
+export interface RefreshResponse {
+  accessToken: string
 }

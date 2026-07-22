@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TopPost } from '~/types/api'
+
 definePageMeta({ layout: 'dashboard' })
 
 const { summary, views, topPosts } = useStats()
@@ -18,7 +20,7 @@ const { data: viewsData } = await useAsyncData(
 const { data: topData } = await useAsyncData(
   'admin-stats-top-posts',
   () => topPosts(10),
-  { default: () => ({ data: [] }) },
+  { default: () => ({ data: [] as TopPost[] }) },
 )
 
 const stats = computed(() => statsData.value?.data ?? null)
@@ -28,7 +30,7 @@ const top = computed(() => topData.value?.data ?? [])
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-highlighted mb-6">Overview</h1>
+    <h1 class="editorial-heading text-2xl text-[var(--text-primary)] mb-6">Overview</h1>
 
     <!-- Stat cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -61,27 +63,27 @@ const top = computed(() => topData.value?.data ?? [])
 
     <!-- Top posts -->
     <div v-if="top.length">
-      <h2 class="text-lg font-semibold text-highlighted mb-4">Top Posts</h2>
-      <div class="rounded-lg border border-default overflow-hidden">
+      <h2 class="editorial-heading text-lg text-[var(--text-primary)] mb-4">Top Posts</h2>
+      <div class="rounded-lg border border-[var(--border-subtle)] overflow-hidden">
         <table class="w-full">
-          <thead class="bg-elevated/50 border-b border-default">
+          <thead class="bg-[var(--surface-subtle)]/50 border-b border-[var(--border-subtle)]">
             <tr>
-              <th class="px-4 py-3 text-left text-sm font-medium text-muted">Title</th>
-              <th class="px-4 py-3 text-right text-sm font-medium text-muted">Views</th>
+              <th class="px-4 py-3 text-left text-sm font-medium text-[var(--text-tertiary)]">Title</th>
+              <th class="px-4 py-3 text-right text-sm font-medium text-[var(--text-tertiary)]">Views</th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="(post, i) in top"
+              v-for="post in top"
               :key="post.id"
-              class="border-b border-default last:border-b-0"
+              class="border-b border-[var(--border-subtle)] last:border-b-0"
             >
               <td class="px-4 py-3 text-sm">
-                <NuxtLink :to="`/blog/${post.slug}`" class="text-primary hover:underline">
+                <NuxtLink :to="`/blog/${post.slug}`" class="text-[var(--ui-color-primary-500)] hover:underline">
                   {{ post.title }}
                 </NuxtLink>
               </td>
-              <td class="px-4 py-3 text-sm text-right text-muted">{{ post.viewCount }}</td>
+              <td class="px-4 py-3 text-sm text-right text-[var(--text-tertiary)]">{{ post.views }}</td>
             </tr>
           </tbody>
         </table>
