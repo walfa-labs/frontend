@@ -10,24 +10,33 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    // Public content routes — SSR at runtime, cached via SWR (revalidate hourly).
     '/': { swr: 3600 },
     '/about': { swr: 3600 },
     '/projects': { swr: 3600 },
     '/projects/**': { swr: 3600 },
     '/blog': { swr: 3600 },
     '/blog/**': { swr: 3600 },
-    // Dashboard + login — pure client-side SPA, no SSR, no indexing.
     '/dashboard/**': { ssr: false },
     '/login': { ssr: false },
-    // API passthrough (same origin via Caddy).
     '/api/**': { cors: true },
   },
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap',
+        },
+      ],
     },
+  },
+  colorMode: {
+    preference: 'system',
+    fallback: 'light',
   },
   devtools: { enabled: true },
   compatibilityDate: '2025-07-15',

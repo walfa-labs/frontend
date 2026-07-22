@@ -1,2 +1,93 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/* ── Editorial Design Tokens ── */
+/* DEFAULT: Light mode — always the base */
+:root {
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --bg-main: #FAFAF8;
+  --surface-panel: #FFFFFF;
+  --surface-subtle: #F5F5F4;
+  --surface-inset: #ECEEEA;
+
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-tertiary: #78716C;
+
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.1);
+
+  --z-base: 1;
+  --z-sticky: 50;
+  --z-dropdown: 100;
+  --z-modal: 200;
+}
+
+/* OPTIONAL: Dark mode — only activates when explicitly toggled */
+.dark {
+  --bg-main: #0C0A09;
+  --surface-panel: #1C1917;
+  --surface-subtle: #292524;
+  --surface-inset: #44403C;
+
+  --text-primary: #FAFAF8;
+  --text-secondary: #A8A29E;
+  --text-tertiary: #78716C;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Base Typography ── */
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
+/* ── Editorial Utilities ── */
+.editorial-heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.editorial-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ── Accessibility ── */
+:focus-visible {
+  outline: 2px solid var(--ui-color-primary-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Scroll Reveal (CSS fallback if JS fails) ── */
+.reveal {
+  opacity: 1;
+}

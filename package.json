@@ -17,6 +17,7 @@
     "@umoteam/editor": "^11.0.4",
     "@umoteam/viewer": "^1.2.0",
     "@unovis/vue": "^1.6.7",
+    "gsap": "^3.15.0",
     "nuxt": "^4.5.0",
     "pinia": "^4.0.2",
     "vue": "^3.5.13",
@@ -24,6 +25,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.118",
     "typescript": "^5.7.0",
     "vue-tsc": "^2.2.0"
   }
