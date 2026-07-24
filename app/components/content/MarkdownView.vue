@@ -2,15 +2,10 @@
 const props = defineProps<{
   content: string
 }>()
+
+const rendered = computed(() => renderMarkdown(props.content))
 </script>
 
 <template>
-  <ClientOnly>
-    <UmoViewer :content="props.content" />
-    <template #fallback>
-      <div class="animate-pulse text-muted">
-        <p>Loading content…</p>
-      </div>
-    </template>
-  </ClientOnly>
+  <div class="prose prose-sm max-w-none" v-html="rendered" />
 </template>
