@@ -79,7 +79,7 @@ const top = computed(() => topData.value?.data ?? [])
               class="border-b border-[var(--border-subtle)] last:border-b-0"
             >
               <td class="px-4 py-3 text-sm">
-                <NuxtLink :to="`/blog/${post.slug}`" class="text-[var(--ui-color-primary-500)] hover:underline">
+                <NuxtLink :to="`/dashboard/posts/${post.id}/edit`" class="text-[var(--accent)] hover:underline">
                   {{ post.title }}
                 </NuxtLink>
               </td>

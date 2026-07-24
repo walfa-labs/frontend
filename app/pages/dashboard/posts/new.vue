@@ -8,6 +8,7 @@ const { adminCreate } = usePosts()
 
 const saving = ref(false)
 const errorMsg = ref<string | null>(null)
+const slugManuallyEdited = ref(false)
 
 const form = reactive({
   title: '',
@@ -51,10 +52,13 @@ async function handleSave() {
 }
 
 function generateSlug() {
-  form.slug = form.title
+  if (slugManuallyEdited.value) return
+  const base = form.title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
+  const suffix = Math.random().toString(36).slice(2, 6)
+  form.slug = base ? `${base}-${suffix}` : suffix
 }
 </script>
 
@@ -68,10 +72,10 @@ function generateSlug() {
     <UForm :schema="schema" :state="form" class="space-y-6" @submit="handleSave">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <UFormField label="Title" name="title">
-          <UInput v-model="form.title" placeholder="My First Post" class="w-full" @blur="generateSlug" />
+          <UInput v-model="form.title" placeholder="My First Post" class="w-full" @input="generateSlug" />
         </UFormField>
         <UFormField label="Slug" name="slug">
-          <UInput v-model="form.slug" placeholder="my-first-post" class="w-full" />
+          <UInput v-model="form.slug" placeholder="my-first-post" class="w-full" @input="slugManuallyEdited = true" />
         </UFormField>
       </div>
 
@@ -90,8 +94,7 @@ function generateSlug() {
 
       <div class="flex items-center gap-4">
         <UFormField label="Status" name="status">
-          <USelect
-            v-model="form.status"
+          <USelect value-key="value" v-model="form.status"
             :items="[{ label: 'Draft', value: 'draft' }, { label: 'Published', value: 'published' }]"
             class="w-40"
           />

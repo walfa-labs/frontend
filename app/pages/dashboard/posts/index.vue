@@ -25,6 +25,10 @@ async function handleDelete(row: Post) {
   await refresh()
 }
 
+function handleEdit(row: Post) {
+  navigateTo(`/dashboard/posts/${row.id}/edit`)
+}
+
 async function togglePublish(row: Post) {
   const newStatus = row.status === 'published' ? 'draft' : 'published'
   await adminSetStatus(row.id, newStatus)
@@ -51,9 +55,10 @@ function formatDate(val: string | null): string {
       :columns="columns"
       :rows="rows"
       @delete="handleDelete"
+      @edit="handleEdit"
     >
       <template #cell-title="{ row }">
-        <NuxtLink :to="`/dashboard/posts/${row.id}/edit`" class="text-[var(--ui-color-primary-500)] hover:underline">
+        <NuxtLink :to="`/dashboard/posts/${row.id}/edit`" class="text-[var(--accent)] hover:underline">
           {{ row.title }}
         </NuxtLink>
       </template>
