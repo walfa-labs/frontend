@@ -12,7 +12,7 @@ defineProps<{
     class="block p-6 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-colors no-underline group"
   >
     <div class="flex items-start justify-between gap-3">
-      <h3 class="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--ui-color-primary-500)] transition-colors">
+      <h3 class="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
         {{ project.title }}
       </h3>
       <UBadge v-if="project.featured" icon="lucide:star" color="primary" variant="soft" size="sm" />
