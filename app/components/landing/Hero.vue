@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { Profile } from '~/types/api'
+
+const profile = useState<Profile | null>('profile', () => null)
 const config = useRuntimeConfig()
 </script>
 
@@ -8,10 +11,10 @@ const config = useRuntimeConfig()
     <UContainer class="relative py-24 md:py-32">
       <div class="max-w-3xl">
         <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-highlighted">
-          Hi, I'm {{ config.public.siteName }}
+          Hi, I'm {{ profile?.name || config.public.siteName }}
         </h1>
         <p class="mt-6 text-xl text-muted leading-relaxed">
-          Software engineer building fast, reliable systems with Go and TypeScript.
+          {{ profile?.tagline || 'Software engineer building fast, reliable systems with Go and TypeScript.' }}
         </p>
         <div class="mt-8 flex gap-4">
           <UButton to="/projects" size="lg" color="primary">
