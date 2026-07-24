@@ -191,3 +191,30 @@ export interface LoginResponse {
 export interface RefreshResponse {
   accessToken: string
 }
+
+// --- Profile ---
+
+export interface Profile {
+  name: string
+  email: string
+  tagline: string
+  bioMarkdown: string
+  location: string
+  avatarUrl: string
+  githubUrl: string
+  linkedinUrl: string
+  twitterUrl: string
+  updatedAt: string
+}
+
+export interface ProfileInput {
+  name: string
+  email: string
+  tagline: string
+  bioMarkdown: string
+  location: string
+  avatarUrl: string
+  githubUrl: string
+  linkedinUrl: string
+  twitterUrl: string
+}
