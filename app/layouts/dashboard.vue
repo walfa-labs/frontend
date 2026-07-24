@@ -12,6 +12,7 @@ const navItems = [
   { label: 'Experience', to: '/dashboard/experiences', icon: 'lucide:briefcase' },
   { label: 'Projects', to: '/dashboard/projects', icon: 'lucide:folder' },
   { label: 'Posts', to: '/dashboard/posts', icon: 'lucide:file-text' },
+  { label: 'Profile', to: '/dashboard/profile', icon: 'lucide:user' },
 ]
 
 const colorModeItems = [
