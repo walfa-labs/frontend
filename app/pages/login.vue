@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { z } from 'zod'
+import type { Profile } from '~/types/api'
 
 definePageMeta({ layout: false })
 
 const { login } = useAuth()
 const config = useRuntimeConfig()
+const profile = useState<Profile | null>('profile', () => null)
 const colorMode = useColorMode()
 
 const loading = ref(false)
@@ -37,7 +39,7 @@ const colorModeItems = [
 ]
 
 useSeoMeta({
-  title: `Login — ${config.public.siteName}`,
+  title: `Login — ${profile.value?.name || config.public.siteName}`,
 })
 </script>
 
