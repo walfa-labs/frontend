@@ -10,6 +10,11 @@ const chartData = computed(() =>
   props.data.map((p) => ({ x: p.bucket, y: p.views })),
 )
 
+// Defined in script (not inline in the template) because vue-tsc cannot
+// parse object type annotations in template attribute expressions.
+const lineX = (_: unknown, i: number) => i
+const lineY = (d: { y: number }) => d.y
+
 function formatBucket(val: string): string {
   try {
     return new Date(val).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -24,7 +29,7 @@ function formatBucket(val: string): string {
     <h3 class="editorial-heading text-lg text-[var(--text-primary)] mb-4">Views Over Time</h3>
     <ClientOnly>
       <VisXYContainer :data="chartData" :height="300">
-        <VisLine :x="(_: unknown, i: number) => i" :y="(d: { y: number }) => d.y" />
+        <VisLine :x="lineX" :y="lineY" />
         <VisAxis
           type="x"
           :tick-format="(i: number) => formatBucket(chartData[i]?.x ?? '')"
