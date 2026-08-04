@@ -9,7 +9,9 @@ export function useApi() {
     credentials: import.meta.client ? 'include' : undefined,
     onRequest({ options }) {
       if (auth.token) {
-        options.headers = { ...options.headers, Authorization: `Bearer ${auth.token}` }
+        const headers = new Headers(options.headers)
+        headers.set('Authorization', `Bearer ${auth.token}`)
+        options.headers = headers
       }
     },
     onResponseError({ response }) {
