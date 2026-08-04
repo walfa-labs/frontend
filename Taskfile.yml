@@ -1,0 +1,48 @@
+version: '3'
+
+# Thin wrappers around the npm scripts — package.json stays the single
+# source of truth. Run `task --list` to see this list with descriptions.
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  setup:
+    desc: Install dependencies (clean install)
+    cmds:
+      - npm ci
+
+  run:
+    desc: Start the Nuxt dev server at http://localhost:3000
+    cmds:
+      - npm run dev
+
+  build:
+    desc: Production build → .output/server/index.mjs
+    cmds:
+      - npm run build
+
+  test:
+    desc: Run unit tests (Vitest)
+    cmds:
+      - npm test
+
+  typecheck:
+    desc: Type-check with vue-tsc
+    cmds:
+      - npm run typecheck
+
+  preview:
+    desc: Preview the production build locally
+    cmds:
+      - npm run preview
+
+  clean:
+    desc: Remove build artifacts (.output, .nuxt, caches), then regenerate .nuxt types
+    cmds:
+      - node -e "const fs=require('fs');for(const p of ['.output','.nuxt','node_modules/.cache'])fs.rmSync(p,{recursive:true,force:true})"
+      # Root tsconfig extends .nuxt/tsconfig.json — regenerate it so
+      # typecheck/test keep working right after a clean.
+      - npx nuxt prepare
