@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Profile } from '~/types/api'
+
 const { list } = useProjects()
 const config = useRuntimeConfig()
 const profile = useState<Profile | null>('profile', () => null)
