@@ -9,10 +9,15 @@ export default defineNuxtConfig({
       siteName: process.env.NUXT_PUBLIC_SITE_NAME || 'Portfolio',
     },
   },
-  routeRules: import.meta.dev ? {
+  // NOTE: use process.env.NODE_ENV here — import.meta.dev is falsy when
+  // nuxt.config.ts itself is loaded, which silently picked the production
+  // branch (SWR caching + no API proxy) in dev.
+  routeRules: process.env.NODE_ENV !== 'production' ? {
     '/dashboard/**': { ssr: false },
     '/login': { ssr: false },
-    '/api/**': { cors: true },
+    // routeRules proxy (not nitro.devProxy) so SSR-internal $fetch calls are
+    // proxied too — devProxy only handles requests over the HTTP listener.
+    '/api/**': { cors: true, proxy: 'http://localhost:8080/api/**' },
   } : {
     '/': { swr: 3600 },
     '/about': { swr: 3600 },
@@ -62,14 +67,6 @@ export default defineNuxtConfig({
         'lucide:star', 'lucide:strikethrough', 'lucide:sun', 'lucide:trash',
         'lucide:trash-2', 'lucide:twitter', 'lucide:user', 'lucide:x',
       ],
-    },
-  },
-  nitro: {
-    devProxy: {
-      '/api': {
-        target: 'http://localhost:8080/api',
-        changeOrigin: true,
-      },
     },
   },
   compatibilityDate: '2025-07-15',
