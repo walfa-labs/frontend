@@ -129,6 +129,7 @@ export interface PostSummary {
 export interface Post extends PostSummary {
   bodyMarkdown: string
   viewCount: number
+  status: ContentStatus
 }
 
 export interface PostInput {

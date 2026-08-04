@@ -10,12 +10,20 @@ A Nuxt 4 portfolio frontend with hybrid rendering — SSR for public content rou
 - **Umo Editor / Viewer** (Tiptap 3 based WYSIWYG, Markdown-first)
 - **Unovis** (dashboard charts)
 - **Zod** (form validation via `UForm`)
+- **Vitest** + **@nuxt/test-utils** (unit testing)
 
 ## Quick Start
 
 ```bash
 npm install
 npm run dev          # http://localhost:3000
+```
+
+Or with [Task](https://taskfile.dev):
+
+```bash
+task setup           # npm ci
+task run             # dev server at http://localhost:3000
 ```
 
 ## Architecture
@@ -36,6 +44,20 @@ See `.env.example` for configuration. Key variables:
 | `NUXT_PUBLIC_API_BASE` | `/api/v1` | Backend API base URL |
 | `NUXT_PUBLIC_SITE_URL` | `https://portfolio.example.com` | Canonical URL for OG tags |
 | `NUXT_PUBLIC_SITE_NAME` | `Portfolio` | Site name in `<title>` |
+
+## Tasks
+
+All common commands are available both as npm scripts and as [Task](https://taskfile.dev) tasks (`Taskfile.yml` just calls the npm scripts):
+
+| Task | npm equivalent | Purpose |
+|---|---|---|
+| `task setup` | `npm ci` | Clean-install dependencies |
+| `task run` | `npm run dev` | Dev server at http://localhost:3000 |
+| `task build` | `npm run build` | Production build → `.output/` |
+| `task test` | `npm test` | Unit tests (Vitest, `tests/**/*.test.ts`) |
+| `task typecheck` | `npm run typecheck` | Type-check with vue-tsc |
+| `task preview` | `npm run preview` | Preview the production build |
+| `task clean` | — | Wipe `.output`/`.nuxt`/caches, regenerate `.nuxt` |
 
 ## Build
 

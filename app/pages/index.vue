@@ -31,13 +31,9 @@ const recentPosts = computed(() => (postsData.value?.data ?? []).slice(0, 3))
 
 // Inline expansion state
 const expandedProject = ref<string | null>(null)
-const expandedExperience = ref<string | null>(null)
 
 function toggleProject(id: string) {
   expandedProject.value = expandedProject.value === id ? null : id
-}
-function toggleExperience(id: string) {
-  expandedExperience.value = expandedExperience.value === id ? null : id
 }
 
 function formatDate(date: string | null): string {
@@ -135,7 +131,7 @@ useHead({
       </div>
     </section>
 
-    <!-- ── Experience (expandable) ── -->
+    <!-- ── Experience (timeline) ── -->
     <section v-if="recentExperiences.length" class="mx-auto max-w-5xl px-6 py-16 md:py-20">
       <div class="flex items-end justify-between mb-8">
         <div>
@@ -148,52 +144,7 @@ useHead({
         </NuxtLink>
       </div>
 
-      <div class="space-y-3">
-        <div
-          v-for="exp in recentExperiences"
-          :key="exp.id"
-          class=" border border-[var(--border-subtle)] rounded-lg overflow-hidden"
-        >
-          <!-- Clickable header -->
-          <button
-            class="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-[var(--surface-subtle)] transition-colors cursor-pointer"
-            @click="toggleExperience(exp.id)"
-          >
-            <div class="flex items-center gap-4 min-w-0">
-              <div class="shrink-0">
-                <p class="text-xs text-[var(--text-tertiary)] font-mono">{{ formatDate(exp.startDate) }} — {{ formatDate(exp.endDate) }}</p>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-base font-semibold text-[var(--text-primary)] truncate">{{ exp.roleTitle }}</h3>
-                <p class="text-sm text-[var(--text-secondary)]">{{ exp.organization }}<span v-if="exp.location" class="text-[var(--text-tertiary)]"> · {{ exp.location }}</span></p>
-              </div>
-            </div>
-            <UIcon
-              :name="expandedExperience === exp.id ? 'lucide:chevron-down' : 'lucide:chevron-right'"
-              class="size-5 text-[var(--text-tertiary)] shrink-0 transition-transform"
-            />
-          </button>
-
-          <!-- Expanded content -->
-          <div class="expand-grid" :class="{ open: expandedExperience === exp.id }">
-            <div>
-              <div class="px-5 pb-5 pt-0 border-t border-[var(--border-subtle)]">
-                <p v-if="exp.summaryMarkdown" class="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">{{ exp.summaryMarkdown }}</p>
-                <ul v-if="exp.highlights.length" class="mt-3 space-y-2">
-                  <li
-                    v-for="(highlight, i) in exp.highlights"
-                    :key="i"
-                    class="text-sm text-[var(--text-secondary)] flex items-start gap-2"
-                  >
-                    <UIcon name="lucide:check" class="size-4 text-[var(--accent)] mt-0.5 shrink-0" />
-                    <ContentMarkdownView :content="highlight.bodyMarkdown" />
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <LandingExperienceTimeline :experiences="recentExperiences" />
     </section>
 
     <div v-if="featuredProjects.length || recentPosts.length" class="mx-auto max-w-5xl px-6"><div class="section-divider" /></div>
