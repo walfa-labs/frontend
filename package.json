@@ -9,22 +9,29 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run"
   },
   "dependencies": {
     "@nuxt/ui": "^4.10.0",
     "@pinia/nuxt": "^1.0.1",
     "@unovis/vue": "^1.6.7",
     "gsap": "^3.15.0",
-    "nuxt": "^4.5.0",
+    "nuxt": "^4.5.1",
     "pinia": "^4.0.2",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0",
+    "vue": "^3.5.40",
+    "vue-router": "^5.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.118",
-    "typescript": "^5.7.0",
-    "vue-tsc": "^2.2.0"
+    "@iconify-json/lucide": "^1.2.121",
+    "@nuxt/test-utils": "^4.1.0",
+    "happy-dom": "^20.11.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^3.3.9"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
   }
 }
