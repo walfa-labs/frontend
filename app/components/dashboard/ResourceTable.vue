@@ -1,22 +1,24 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends object">
 interface Column {
   key: string
   label: string
   class?: string
 }
 
-type Row = Record<string, unknown>
-
-const props = defineProps<{
+defineProps<{
   columns: Column[]
-  rows: Row[]
+  rows: T[]
   loading?: boolean
 }>()
 
 defineEmits<{
-  edit: [row: Row]
-  delete: [row: Row]
+  edit: [row: T]
+  delete: [row: T]
 }>()
+
+function cellValue(row: T, key: string): unknown {
+  return (row as Record<string, unknown>)[key]
+}
 </script>
 
 <template>
@@ -44,8 +46,8 @@ defineEmits<{
           class="border-b border-[var(--border-subtle)] last:border-b-0 hover:bg-[var(--surface-subtle)]/30"
         >
           <td v-for="col in columns" :key="col.key" class="px-4 py-3 text-sm">
-            <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
-              {{ row[col.key] }}
+            <slot :name="`cell-${col.key}`" :row="row" :value="cellValue(row, col.key)">
+              {{ cellValue(row, col.key) }}
             </slot>
           </td>
           <td class="px-4 py-3 text-right">
