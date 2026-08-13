@@ -1,7 +1,7 @@
 # ==============================================================================
 # Stage 1: Base & Dependencies
 # ==============================================================================
-FROM node:24-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 
 # Install build dependencies if needed (e.g. for native modules)
@@ -16,7 +16,7 @@ RUN npm ci
 # ==============================================================================
 # Stage 2: Builder
 # ==============================================================================
-FROM node:24-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -32,7 +32,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 3: Hardened Production Runtime
 # ==============================================================================
-FROM node:24-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 
 # Set production environment flags
