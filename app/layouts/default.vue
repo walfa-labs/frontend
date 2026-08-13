@@ -19,14 +19,10 @@ const isActive = (to: string) => {
 }
 
 const colorModeItems = [
-  { label: 'Light', value: 'light', icon: 'lucide:sun' },
-  { label: 'Dark', value: 'dark', icon: 'lucide:moon' },
-  { label: 'System', value: 'system', icon: 'lucide:monitor' },
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' },
+  { label: 'System', value: 'system' },
 ]
-
-function setColorMode(value: string) {
-  colorMode.preference = value
-}
 </script>
 
 <template>
@@ -55,24 +51,19 @@ function setColorMode(value: string) {
 
           <div class="w-px h-5 sm:h-6 bg-[var(--border-default)] mx-1 sm:mx-2 shrink-0" />
 
-          <!-- Color mode toggle -->
-          <UDropdownMenu
-            :items="colorModeItems.map(item => ({
-              label: item.label,
-              icon: item.icon,
-              onSelect: () => setColorMode(item.value),
-              class: colorMode.preference === item.value ? 'text-primary font-semibold' : '',
-            }))"
+          <!-- Color mode switcher (native select: opens in every engine and is
+               keyboard-accessible without custom menu JavaScript) -->
+          <label class="sr-only" for="color-mode-select">Color mode</label>
+          <select
+            id="color-mode-select"
+            v-model="colorMode.preference"
+            class="shrink-0 appearance-none rounded-md border-0 bg-transparent py-1.5 pl-2 pr-6 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+            aria-label="Color mode"
           >
-            <UButton
-              variant="ghost"
-              color="neutral"
-              size="sm"
-              class="shrink-0"
-              :icon="colorMode.preference === 'dark' ? 'lucide:moon' : colorMode.preference === 'light' ? 'lucide:sun' : 'lucide:monitor'"
-              aria-label="Toggle color mode"
-            />
-          </UDropdownMenu>
+            <option v-for="item in colorModeItems" :key="item.value" :value="item.value">
+              {{ item.label }}
+            </option>
+          </select>
         </nav>
       </div>
     </header>
