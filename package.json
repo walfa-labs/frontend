@@ -40,6 +40,12 @@
     "vue-tsc": "^3.3.9"
   },
   "overrides": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "unhead": "3.2.3",
+    "@unhead/vue": "3.2.3",
+    "@unhead/bundler": "3.2.3",
+    "@unhead/dom": "3.2.3",
+    "@unhead/schema": "3.2.3",
+    "@unhead/shared": "3.2.3"
   }
 }

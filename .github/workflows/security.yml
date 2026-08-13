@@ -26,11 +26,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Gitleaks
+        run: |
+          curl -sSL -o gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.24.0/gitleaks_8.24.0_linux_x64.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks
+          chmod +x gitleaks
+          sudo mv gitleaks /usr/local/bin/
+
       - name: Run Gitleaks Scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_CONFIG: .gitleaks.toml
+        run: gitleaks detect --source . --config .gitleaks.toml --verbose --redact
 
   zizmor:
     name: Workflow Security Analysis (Zizmor)
@@ -39,14 +43,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run zizmor linter
-        uses: woodruffw/zizmor-action@v1
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@v0.6.1
         with:
           template: sarif
           output: zizmor.sarif
 
       - name: Upload zizmor SARIF report
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: zizmor.sarif
@@ -62,14 +66,14 @@ jobs:
       - name: Setup Node.js runtime
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Run npm audit check
         run: npm audit --audit-level=high
 
       - name: Run Trivy vulnerability scanner (Repository Filesystem)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -78,7 +82,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy SARIF report
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-fs.sarif'
@@ -92,18 +96,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Semgrep SAST Scan
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/secrets
-            p/javascript
-            p/typescript
-            p/owasp-top-ten
-          generateSarif: '1'
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/src" -w /src semgrep/semgrep semgrep scan --sarif --output=semgrep.sarif --config=p/security-audit --config=p/secrets --config=p/javascript --config=p/typescript --config=p/owasp-top-ten
 
       - name: Upload Semgrep SARIF report
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: semgrep.sarif
@@ -124,7 +121,7 @@ jobs:
         run: |
           docker run -d --name test-app -p 3000:3000 walfa-labs-frontend:test
           # Wait for container health check
-          sleep 10
+          sleep 5
           curl -I --retry 5 --retry-delay 2 http://localhost:3000/ || exit 1
 
       - name: Run OWASP ZAP Baseline DAST Scan

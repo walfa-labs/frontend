@@ -1,7 +1,7 @@
 # ==============================================================================
 # Stage 1: Base & Dependencies
 # ==============================================================================
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
 
 # Install build dependencies if needed (e.g. for native modules)
@@ -16,7 +16,7 @@ RUN npm ci
 # ==============================================================================
 # Stage 2: Builder
 # ==============================================================================
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -32,7 +32,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 3: Hardened Production Runtime
 # ==============================================================================
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 # Set production environment flags
@@ -43,6 +43,9 @@ ENV NUXT_TELEMETRY_DISABLED=1
 
 # Security: Run as non-root user (built-in 'node' user in official Node images)
 USER node
+
+# Copy node_modules so symlinked runtime dependencies from Nitro resolve correctly
+COPY --from=deps --chown=node:node /app/node_modules ./node_modules
 
 # Copy built server output and public assets with proper non-root ownership
 COPY --from=builder --chown=node:node /app/.output ./.output
