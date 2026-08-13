@@ -44,10 +44,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@v0.6.1
-        with:
-          template: sarif
-          output: zizmor.sarif
+        run: |
+          pipx run zizmor --format=sarif . > zizmor.sarif
 
       - name: Upload zizmor SARIF report
         uses: github/codeql-action/upload-sarif@v4
@@ -72,14 +70,13 @@ jobs:
       - name: Run npm audit check
         run: npm audit --audit-level=high
 
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Run Trivy vulnerability scanner (Repository Filesystem)
-        uses: aquasecurity/trivy-action@0.30.0
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-fs.sarif'
-          severity: 'CRITICAL,HIGH'
+        run: |
+          trivy fs --format sarif --output trivy-fs.sarif --severity CRITICAL,HIGH .
 
       - name: Upload Trivy SARIF report
         uses: github/codeql-action/upload-sarif@v4
