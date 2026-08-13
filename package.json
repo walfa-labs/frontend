@@ -10,7 +10,12 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@nuxt/ui": "^4.10.0",
@@ -26,6 +31,9 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.121",
     "@nuxt/test-utils": "^4.1.0",
+    "@playwright/test": "^1.62.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vue/test-utils": "^2.4.11",
     "happy-dom": "^20.11.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10",
