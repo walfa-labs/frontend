@@ -1,7 +1,7 @@
 version: '3'
 
-# Thin wrappers around the npm scripts — package.json stays the single
-# source of truth. Run `task --list` to see this list with descriptions.
+# Unified Automation Taskfile for Walfa Labs Frontend
+# Run `task --list` to view all available commands.
 
 tasks:
   default:
@@ -9,30 +9,24 @@ tasks:
       - task --list
     silent: true
 
+  # ----------------------------------------------------------------------------
+  # Development & Build Tasks
+  # ----------------------------------------------------------------------------
   setup:
-    desc: Install dependencies (clean install)
+    desc: Clean-install all dependencies via npm ci
     cmds:
       - npm ci
 
   run:
-    desc: Start the Nuxt dev server at http://localhost:3000
+    desc: Start local development server at http://localhost:3000
+    aliases: [dev]
     cmds:
       - npm run dev
 
   build:
-    desc: Production build → .output/server/index.mjs
+    desc: Build production Nitro server bundle → .output/server/index.mjs
     cmds:
       - npm run build
-
-  test:
-    desc: Run unit tests (Vitest)
-    cmds:
-      - npm test
-
-  typecheck:
-    desc: Type-check with vue-tsc
-    cmds:
-      - npm run typecheck
 
   preview:
     desc: Preview the production build locally
@@ -40,9 +34,129 @@ tasks:
       - npm run preview
 
   clean:
-    desc: Remove build artifacts (.output, .nuxt, caches), then regenerate .nuxt types
+    desc: Deep clean all build artifacts (.output, .nuxt, caches) and regenerate types
     cmds:
-      - node -e "const fs=require('fs');for(const p of ['.output','.nuxt','node_modules/.cache'])fs.rmSync(p,{recursive:true,force:true})"
-      # Root tsconfig extends .nuxt/tsconfig.json — regenerate it so
-      # typecheck/test keep working right after a clean.
+      - node -e "const fs=require('fs');for(const p of ['.output','.nuxt','node_modules/.cache','coverage','test-results','playwright-report'])fs.rmSync(p,{recursive:true,force:true})"
       - npx nuxt prepare
+
+  # ----------------------------------------------------------------------------
+  # Quality & Testing Tasks
+  # ----------------------------------------------------------------------------
+  typecheck:
+    desc: Run TypeScript and Vue SFC type checking with vue-tsc
+    cmds:
+      - npm run typecheck
+
+  test:
+    desc: Run unit & integration tests (Vitest)
+    aliases: [test:unit]
+    cmds:
+      - npm run test:unit
+
+  test:coverage:
+    desc: Run unit & integration tests with v8 code coverage reporting
+    cmds:
+      - npm run test:coverage
+
+  test:e2e:
+    desc: Run Playwright end-to-end tests against local application
+    cmds:
+      - npm run test:e2e
+
+  test:e2e:ui:
+    desc: Open interactive Playwright UI Test Runner
+    cmds:
+      - npm run test:e2e:ui
+
+  test:e2e:report:
+    desc: Open generated Playwright HTML test report
+    cmds:
+      - npm run test:e2e:report
+
+  test:all:
+    desc: Run all tests (Unit, Integration, and Playwright E2E)
+    cmds:
+      - task: test:coverage
+      - task: test:e2e
+
+  # ----------------------------------------------------------------------------
+  # Docker Containerization Tasks
+  # ----------------------------------------------------------------------------
+  docker:build:
+    desc: Build hardened multi-stage production Docker image
+    cmds:
+      - docker build -t walfa-labs-frontend:latest .
+
+  docker:run:
+    desc: Run production container on port 3000
+    cmds:
+      - docker run -d --name walfa-labs-frontend -p 3000:3000 walfa-labs-frontend:latest
+
+  docker:dev:
+    desc: Start development container environment with hot reloading via compose
+    cmds:
+      - docker compose up --build
+
+  docker:prod:
+    desc: Run production stack with health checks via docker-compose.prod.yml
+    cmds:
+      - docker compose -f docker-compose.prod.yml up --build -d
+
+  docker:stop:
+    desc: Stop all running docker-compose containers
+    cmds:
+      - docker compose down
+      - docker compose -f docker-compose.prod.yml down
+
+  # ----------------------------------------------------------------------------
+  # Security, DevSecOps & Scanning Tasks
+  # ----------------------------------------------------------------------------
+  security:audit:
+    desc: Run npm dependency vulnerability audit
+    cmds:
+      - npm audit --audit-level=moderate
+
+  security:secrets:
+    desc: Scan repository for secrets using Gitleaks
+    cmds:
+      - docker run --rm -v "{{.ROOT_DIR}}:/path" zricethezav/gitleaks:latest detect --source="/path" --config="/path/.gitleaks.toml" --verbose
+
+  security:sast:
+    desc: Run static application security testing (Semgrep SAST)
+    cmds:
+      - docker run --rm -v "{{.ROOT_DIR}}:/src" returntocorp/semgrep semgrep --config=p/security-audit --config=p/secrets --config=p/javascript --config=p/typescript
+
+  security:sca:
+    desc: Run software composition analysis using Trivy
+    cmds:
+      - docker run --rm -v "{{.ROOT_DIR}}:/src" aquasec/trivy fs /src
+
+  security:dast:
+    desc: Run OWASP ZAP baseline dynamic scan against running app (http://localhost:3000)
+    cmds:
+      - docker run --rm -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://host.docker.internal:3000
+
+  security:zizmor:
+    desc: Run zizmor GitHub Actions workflow security linter
+    cmds:
+      - docker run --rm -v "{{.ROOT_DIR}}:/src" ghcr.io/woodruffw/zizmor:latest /src
+
+  security:all:
+    desc: Run all local security checks (audit, secrets, sast, sca)
+    cmds:
+      - task: security:audit
+      - task: security:secrets
+      - task: security:sast
+      - task: security:sca
+
+  # ----------------------------------------------------------------------------
+  # Full Local CI Verification Pipeline
+  # ----------------------------------------------------------------------------
+  ci:
+    desc: Run the complete CI verification pipeline locally
+    cmds:
+      - task: typecheck
+      - task: test:coverage
+      - task: test:e2e
+      - task: build
+      - task: security:audit
