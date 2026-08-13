@@ -39,8 +39,11 @@ test.describe('Home Page', () => {
     // Open the dropdown and pick the opposite mode. Reka renders the menu
     // teleported into <body> with role=menu / role=menuitem only once open.
     await themeBtn.click()
-    const targetOption = page.getByRole('menuitem', { name: isDark ? /light/i : /dark/i })
-    await targetOption.click()
+    // Match by text (more forgiving than accessible-name across engines) and
+    // force the click: Reka positions teleported items with tabindex=-1 so
+    // Playwright's actionability wait can hang in some engines.
+    const targetOption = page.locator('[role="menuitem"]').filter({ hasText: isDark ? /light/i : /dark/i })
+    await targetOption.click({ force: true })
 
     // Assert the observable contract: the html class actually flipped (dark ↔ light).
     await expect(htmlEl).toHaveClass(isDark ? /(^|\s)light(\s|$)/ : /(^|\s)dark(\s|$)/)
