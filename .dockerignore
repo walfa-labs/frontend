@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Node & Package Managers
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Nuxt & Build Outputs
+.nuxt
+.output
+dist
+
+# Testing & Coverage
+coverage
+playwright-report
+test-results
+blob-report
+
+# Environments & Local Secrets
+.env
+.env.*
+!.env.example
+
+# IDE & Editor Files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Task / CI Temp
+.task
+.gemini

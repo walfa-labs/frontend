@@ -1,0 +1,33 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: walfa-labs-frontend:latest
+    container_name: walfa-labs-frontend-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+      - NUXT_PUBLIC_API_BASE=${NUXT_PUBLIC_API_BASE:-/api/v1}
+      - NUXT_PUBLIC_SITE_URL=${NUXT_PUBLIC_SITE_URL:-https://portfolio.example.com}
+      - NUXT_PUBLIC_SITE_NAME=${NUXT_PUBLIC_SITE_NAME:-Walfa Portfolio}
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
