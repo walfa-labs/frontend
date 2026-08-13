@@ -40,12 +40,12 @@ function setColorMode(value: string) {
           <span class="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
           {{ profile?.name || config.public.siteName }}
         </NuxtLink>
-        <nav class="flex items-center gap-0.5">
+        <nav class="flex items-center gap-0.5 sm:gap-1 shrink-0">
           <NuxtLink
             v-for="item in navItems"
             :key="item.to"
             :to="item.to"
-            class="px-3 py-2 text-sm font-medium rounded-md transition-colors no-underline"
+            class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors no-underline shrink-0"
             :class="isActive(item.to)
               ? 'text-[var(--accent)] bg-[var(--accent-subtle)]'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]'"
@@ -53,7 +53,7 @@ function setColorMode(value: string) {
             {{ item.label }}
           </NuxtLink>
 
-          <div class="w-px h-6 bg-[var(--border-default)] mx-2" />
+          <div class="w-px h-5 sm:h-6 bg-[var(--border-default)] mx-1 sm:mx-2 shrink-0" />
 
           <!-- Color mode toggle -->
           <UDropdownMenu
@@ -68,6 +68,7 @@ function setColorMode(value: string) {
               variant="ghost"
               color="neutral"
               size="sm"
+              class="shrink-0"
               :icon="colorMode.preference === 'dark' ? 'lucide:moon' : colorMode.preference === 'light' ? 'lucide:sun' : 'lucide:monitor'"
               aria-label="Toggle color mode"
             />

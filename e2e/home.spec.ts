@@ -25,11 +25,8 @@ test.describe('Home Page', () => {
   })
 
   test('toggles color scheme mode', async ({ page }) => {
-    // The color mode toggle may be a simple button or a dropdown trigger.
-    // Use a broad selector to find it, then interact appropriately.
-    const themeBtn = page.locator('button[aria-label*="color" i], button[aria-label*="theme" i], button[aria-label*="mode" i]').first()
-    
-    // Skip test gracefully if no toggle is visible (e.g. hidden on certain viewports)
+    // Find the color-mode toggle (Reka dropdown trigger in Nuxt UI).
+    const themeBtn = page.getByRole('button', { name: 'Toggle color mode' })
     if (!(await themeBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
       test.skip()
       return
@@ -37,37 +34,15 @@ test.describe('Home Page', () => {
 
     const htmlEl = page.locator('html')
     const initialClass = await htmlEl.getAttribute('class') || ''
+    const isDark = initialClass.includes('dark')
 
-    // Check if it's a dropdown trigger (aria-haspopup)
-    const hasPopup = await themeBtn.getAttribute('aria-haspopup')
-    
-    if (hasPopup) {
-      // It's a dropdown — click to open, then select the opposite mode
-      await themeBtn.click()
-      // Wait for dropdown menu to appear
-      const menuItem = page.locator('[role="menuitem"], [role="menuitemradio"]').first()
-      await menuItem.waitFor({ state: 'visible', timeout: 5000 })
-      
-      // Pick "Dark" or "Light" option depending on current mode
-      const isDark = initialClass.includes('dark')
-      const targetOption = page.locator(`[role="menuitem"], [role="menuitemradio"]`).filter({
-        hasText: isDark ? /light/i : /dark/i
-      }).first()
-      
-      if (await targetOption.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await targetOption.click()
-      } else {
-        // Just click the first available option
-        await menuItem.click()
-      }
-    } else {
-      // Simple toggle button
-      await themeBtn.click({ force: true })
-    }
+    // Open the dropdown and pick the opposite mode. Reka renders the menu
+    // teleported into <body> with role=menu / role=menuitem only once open.
+    await themeBtn.click()
+    const targetOption = page.getByRole('menuitem', { name: isDark ? /light/i : /dark/i })
+    await targetOption.click()
 
-    await page.waitForTimeout(500)
-    const updatedClass = await htmlEl.getAttribute('class') || ''
-    // Verify that the class actually changed (dark ↔ light)
-    expect(updatedClass).not.toBe(initialClass)
+    // Assert the observable contract: the html class actually flipped (dark ↔ light).
+    await expect(htmlEl).toHaveClass(isDark ? /(^|\s)light(\s|$)/ : /(^|\s)dark(\s|$)/)
   })
 })
