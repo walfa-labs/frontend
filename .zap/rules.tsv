@@ -1,0 +1,6 @@
+# OWASP ZAP Baseline Scan Rule Configuration
+# Format: <rule-id>\t<threshold>\t<optional-notes>
+# Thresholds: IGNORE, INFO, LOW, MEDIUM, HIGH, FAIL
+10015	IGNORE	Re-examine Cache-Control Directives
+10096	INFO	Timestamp Disclosure - Unix
+10027	IGNORE	Information Disclosure - Suspicious Comments

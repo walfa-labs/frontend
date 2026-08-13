@@ -1,0 +1,21 @@
+title = "Walfa Labs Frontend Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlists for harmless test/mock data and build tokens"
+paths = [
+  '''(?i)package-lock\.json''',
+  '''(?i)tests/.*''',
+  '''(?i)e2e/.*''',
+  '''(?i)\.output/.*''',
+  '''(?i)\.nuxt/.*''',
+  '''(?i)\.env\.example''',
+]
+stopwords = [
+  "test-jwt-token",
+  "jwt-token-xyz",
+  "secure-jwt-token",
+  "persisted-jwt-token",
+]
