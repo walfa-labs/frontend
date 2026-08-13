@@ -20,10 +20,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js runtime
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: 'npm'
@@ -36,7 +36,7 @@ jobs:
         run: echo "version=$(npm list @playwright/test --json | node -e "const p=JSON.parse(require('fs').readFileSync(0));console.log(p.dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -57,7 +57,7 @@ jobs:
           PORT: 3000
 
       - name: Upload Playwright Test Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report
@@ -65,7 +65,7 @@ jobs:
           retention-days: 14
 
       - name: Upload Test Results on Failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-results
