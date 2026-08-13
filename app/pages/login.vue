@@ -66,20 +66,20 @@ useSeoMeta({
       </UForm>
 
       <!-- Color mode toggle -->
-      <div class="mt-6 flex justify-center">
+      <div v-if="colorMode" class="mt-6 flex justify-center">
         <UDropdownMenu
           :items="colorModeItems.map(item => ({
             label: item.label,
             icon: item.icon,
             onSelect: () => colorMode.preference = item.value,
-            class: colorMode.preference === item.value ? 'text-primary font-semibold' : '',
+            class: (colorMode?.preference || 'system') === item.value ? 'text-primary font-semibold' : '',
           }))"
         >
           <UButton
             variant="ghost"
             color="neutral"
             size="sm"
-            :icon="colorMode.preference === 'dark' ? 'lucide:moon' : colorMode.preference === 'light' ? 'lucide:sun' : 'lucide:monitor'"
+            :icon="(colorMode?.preference || 'system') === 'dark' ? 'lucide:moon' : (colorMode?.preference || 'system') === 'light' ? 'lucide:sun' : 'lucide:monitor'"
             aria-label="Toggle color mode"
           />
         </UDropdownMenu>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ensureProfile } from '~/composables/useProfile'
 
-await ensureProfile()
+if (import.meta.server) {
+  await ensureProfile()
+}
 </script>
 
 <template>

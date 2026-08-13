@@ -30,6 +30,7 @@ export async function ensureProfile() {
   try {
     const res = await $fetch<ApiResponse<Profile>>(
       `${config.public.apiBase}/profile`,
+      { timeout: 2000 }
     )
     profile.value = res.data
   } catch {
