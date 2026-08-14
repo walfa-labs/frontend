@@ -1,123 +1,233 @@
 # AGENTS.md
 
-Guidance for AI coding agents working in this repository.
+> **Guidance & Operational Manual for AI Coding Agents and Engineers**  
+> Repository: `walfa-labs-frontend` | Framework: **Nuxt 4.5+ (Vue 3.5+, TypeScript 5.9+)**
 
-## Project overview
+---
 
-`walfa-labs-frontend` is a **Nuxt 4 portfolio frontend** with hybrid rendering:
+## 1. Project Overview & Core Mission
 
-- Public content routes (`/`, `/about`, `/projects/**`, `/blog/**`) are **SSR with 1-hour SWR caching** for SEO and Open Graph cards.
-- The admin **dashboard (`/dashboard/**`) and `/login` are client-only SPA** (`ssr: false`) and marked `noindex`.
+`walfa-labs-frontend` is the frontend application for the **Walfa Labs** personal portfolio and content management system. It employs a **hybrid rendering architecture**:
 
-The frontend talks to a **Go (Fiber) backend API** living in the sibling repo (`../backend`). The wire format is documented in `app/types/api.ts`, which mirrors the backend DTOs (camelCase) and was audited against `../backend/internal/adapter/handler/dto.go` (see the comment at the top of that file). Keep it in sync when the backend changes.
+- **Public Content Routes (`/`, `/about`, `/projects/**`, `/blog/**`)**: Server-Side Rendered (SSR) with **1-hour SWR caching** (`swr: 3600`) for near-instant TTFB, rich SEO metadata, Open Graph cards, and JSON-LD structured data.
+- **Admin Management & Auth (`/dashboard/**`, `/login`)**: Client-only Single Page Application (`ssr: false`) with `robots: noindex, nofollow` headers and global route protection.
 
-## Tech stack
+The frontend connects to a companion **Go (Fiber)** REST API backend (`../backend`). Wire format models are codified in `app/types/api.ts` (camelCase DTOs).
 
-- **Nuxt 4** (new `app/` directory structure, `ssr: true` + `routeRules` hybrid rendering), Vue 3.5, TypeScript
-- **Nuxt UI v4** (Reka UI + Tailwind CSS v4 via `@import "tailwindcss"` in `app/assets/css/main.css`)
-- **Pinia** (`@pinia/nuxt`) for state: `app/stores/auth.ts` (JWT token), `app/stores/ui.ts` (sidebar)
-- **Zod** for form validation through `UForm`
-- **Vitest 4** + **@nuxt/test-utils** (happy-dom) for unit tests in `tests/`
-- **@unovis/vue** for the dashboard views chart; **gsap** is declared as a dependency but currently unused (page animations are pure CSS, see `main.css`)
-- **@nuxt/icon** with the `lucide` collection (`@iconify-json/lucide`)
-- Fonts (Fraunces, Inter, JetBrains Mono) are loaded from Google Fonts in `nuxt.config.ts` `app.head`
+---
 
-## Build and run commands
+## 2. Technical Stack & Dependencies
+
+| Tool / Library | Version / Scope | Role in Repository |
+|---|---|---|
+| **Nuxt** | `^4.5.2` | Core meta-framework (using the Nuxt 4 `app/` directory convention) |
+| **Vue** | `^3.5.41` | Composition API, `<script setup lang="ts">`, Vue SFCs |
+| **Nuxt UI** | `^4.10.0` | UI component library (Reka UI primitives + Tailwind CSS v4) |
+| **Tailwind CSS** | `v4` | Loaded via `@import "tailwindcss"` and `@import "@nuxt/ui"` in `app/assets/css/main.css` |
+| **Pinia** | `^4.0.2` (`@pinia/nuxt`) | Client-side reactive stores (`auth.ts`, `ui.ts`) |
+| **Zod** | `^4.4.3` | Schema definition and form validation integrated with `UForm` |
+| **@unovis/vue** | `^1.6.7` | Time-series and categorical charts for dashboard view metrics |
+| **@nuxt/icon** | `^1.x` (`@iconify-json/lucide`) | Vector icon rendering via `<UIcon name="lucide:*" />` |
+| **Vitest** | `^4.1.10` (`@nuxt/test-utils`) | Fast unit, store, composable, and contract testing (happy-dom) |
+| **Playwright** | `^1.62.1` | Cross-browser end-to-end user journey tests in `e2e/` |
+| **Taskfile** | `v3` | Automation runner wrapping npm and container workflows |
+
+---
+
+## 3. Directory Layout & Architecture Map
+
+The project strictly follows the **Nuxt 4 directory structure** where all application code lives under `app/`:
+
+```
+walfa-labs-frontend/
+├── app/
+│   ├── app.vue                   # Root component: SSR profile hydration & UApp wrapper
+│   ├── app.config.ts             # Theme tokens (primary: emerald, neutral: stone)
+│   ├── assets/
+│   │   └── css/main.css          # Design tokens (CSS custom properties) & typography
+│   ├── components/
+│   │   ├── content/              # Public cards: PostCard, ExperienceCard, MarkdownView
+│   │   ├── dashboard/            # Admin widgets: StatCard, ResourceTable, ViewsChart
+│   │   ├── editor/               # UmoEditor.client.vue: Hand-written markdown editor
+│   │   └── landing/              # Landing sections: Hero, FeaturedProjects, RecentPosts, Timeline
+│   ├── composables/              # Typed data hooks: useApi, useAuth, usePosts, useProjects, etc.
+│   ├── layouts/                  # default.vue (public shell) & dashboard.vue (admin sidebar shell)
+│   ├── middleware/               # auth.global.ts: Global client-side navigation guard
+│   ├── pages/                    # File-based routes (public pages & dashboard CRUD)
+│   │   ├── index.vue             # Landing page
+│   │   ├── about.vue             # About page & education/career timeline
+│   │   ├── login.vue             # Admin login form
+│   │   ├── blog/                 # Blog index & [slug].vue post details
+│   │   ├── projects/             # Projects index & [slug].vue project details
+│   │   └── dashboard/            # Dashboard overview & CRUD subtrees (posts, projects, experiences, profile)
+│   ├── stores/                   # Pinia stores: auth.ts, ui.ts
+│   ├── types/
+│   │   └── api.ts                # TypeScript interfaces mirroring Go backend DTOs
+│   └── utils/
+│       └── markdown.ts           # renderMarkdown() utility with XSS sanitization
+├── e2e/                          # Playwright end-to-end test specs
+├── tests/                        # Vitest unit & integration test suites
+├── Dockerfile                    # Multi-stage production container (node:26-alpine)
+├── Dockerfile.dev                # Hot-reloading development container
+├── docker-compose.yml            # Dev docker compose setup
+├── docker-compose.prod.yml       # Production docker compose stack
+├── nuxt.config.ts                # Nuxt config, routeRules, icon bundles, head tags
+├── package.json                  # Scripts and package manifests
+├── playwright.config.ts          # Playwright test config
+├── Taskfile.yml                  # Task runner commands
+├── tsconfig.json                 # TypeScript compiler configuration
+└── vitest.config.ts              # Vitest test runner configuration
+```
+
+---
+
+## 4. Build, Development & Verification Commands
+
+All standard development commands run via `npm` or `task`:
 
 ```bash
-npm install            # also runs `nuxt prepare` via postinstall
-npm run dev            # dev server at http://localhost:3000
-npm run build          # production build → .output/server/index.mjs (Nitro Node server)
-npm run preview        # preview the production build locally
-npm run typecheck      # nuxt typecheck (vue-tsc) — run this to verify changes
-npm test               # unit tests (Vitest) — tests/**/*.test.ts
-node .output/server/index.mjs   # start the production server (HOST/PORT env, defaults 0.0.0.0:3000)
+# Dependencies
+npm install                       # Clean install + runs `nuxt prepare` via postinstall
+task setup                        # Wrapper for `npm ci`
+
+# Development
+npm run dev                       # Start dev server at http://localhost:3000
+task dev                          # Task alias for `npm run dev`
+
+# Production Build & Preview
+npm run build                     # Compile production bundle → .output/server/index.mjs
+npm run preview                   # Preview compiled production server locally
+task build                        # Task wrapper for `npm run build`
+task preview                      # Task wrapper for `npm run preview`
+
+# Quality & Type Checking
+npm run typecheck                 # Run vue-tsc type checking across all SFCs & TS files
+task typecheck                    # Task wrapper for `npm run typecheck`
+
+# Unit & Integration Tests
+npm test                          # Run Vitest test suite (`tests/**/*.test.ts`)
+npm run test:coverage             # Run Vitest with v8 code coverage reporting
+task test                         # Task wrapper for `npm test`
+task test:coverage                # Task wrapper for `npm run test:coverage`
+
+# End-to-End Tests
+npm run test:e2e                  # Run Playwright E2E tests (`e2e/**/*.spec.ts`)
+npm run test:e2e:ui               # Launch interactive Playwright test runner UI
+task test:e2e                     # Task wrapper for `npm run test:e2e`
+
+# Comprehensive Quality Gate
+task ci                           # Runs typecheck + test:coverage + test:e2e + build + audit
 ```
 
-Every npm script above also has a wrapper in `Taskfile.yml` (requires [Task](https://taskfile.dev)): `task setup` (`npm ci`), `task run`, `task build`, `task test`, `task typecheck`, `task preview`, and `task clean` (wipes `.output`/`.nuxt`/caches, then regenerates `.nuxt` via `nuxt prepare`). The tasks just call the npm scripts — `package.json` stays the single source of truth.
+### Critical Rules on Commands
 
-- **Do NOT use `npm run generate`** — static generation disables the hybrid rendering the dashboard relies on (per README).
-- Unit tests use **Vitest** (`tests/**/*.test.ts`, happy-dom environment by default; a file can opt into the full Nuxt environment with a `// @vitest-environment nuxt` docblock). There is **no linter/formatter configured**. Verification = `npm run typecheck` + `npm test` + `npm run build`. Do not add lint tooling unless explicitly asked.
-- In dev, `/api/**` is proxied → `http://localhost:8080/api/**` via a **`routeRules` proxy rule** in `nuxt.config.ts` (not `nitro.devProxy` — that only intercepts requests over the HTTP listener, so SSR-internal `$fetch` calls bypass it). The dev/prod `routeRules` branch is switched on `process.env.NODE_ENV` because `import.meta.dev` is falsy when `nuxt.config.ts` itself is loaded. Run the Go backend on port 8080.
+- ⛔ **Do NOT use `npm run generate`**: Nuxt static generation breaks the client-side SPA routing required by `/dashboard/**` and dynamic backend proxy rules.
+- 💡 **Verification standard**: When modifying code, always verify with `npm run typecheck && npm test`.
 
-## Environment configuration
+---
 
-Copy `.env.example` to `.env`. All config is public runtime config:
+## 5. Development Conventions & Patterns
 
-| Variable | Default | Purpose |
+### 5.1 API Access Layer (`useApi.ts` & Composables)
+
+- **Always route API calls through `useApi()`** (`app/composables/useApi.ts`).
+- `useApi()` creates a `$fetch.create` instance with:
+  - Base URL resolved from `useRuntimeConfig().public.apiBase`.
+  - Automatic `Authorization: Bearer <token>` header injection when user is logged in.
+  - Automatic 401 interception: clears auth state and navigates to `/login`.
+  - **Important**: `credentials: 'include'` MUST remain client-only (`import.meta.client`). Setting it on the server breaks SSR fetch in Nitro.
+- **Resource Composables**: Wrap `useApi()` in dedicated composables:
+  - `usePosts.ts`: `list()`, `getBySlug()`, `adminList()`, `adminGet()`, `adminCreate()`, `adminUpdate()`, `adminDelete()`.
+  - `useProjects.ts`: `list()`, `getBySlug()`, `adminList()`, `adminGet()`, `adminCreate()`, `adminUpdate()`, `adminDelete()`.
+  - `useExperiences.ts`: `list()`, `adminList()`, `adminGet()`, `adminCreate()`, `adminUpdate()`, `adminDelete()`.
+  - `useProfile.ts`: `get()`, `adminUpdate()`, `ensureProfile()`, `useProfileState()`.
+  - `useStats.ts`: `getSummary()`, `getPostViews()`, `getTopPosts()`.
+  - `useAssets.ts`: `adminUpload()`.
+
+### 5.2 Server-Side Profile Hydration
+
+- The global profile is prefetched during SSR in `app.vue` via `ensureProfile()`.
+- State is shared across components using `useProfileState()` (backed by `useState('site-profile')`).
+- **Null Safety**: Components must handle a `null` profile gracefully with fallback defaults.
+
+### 5.3 Authentication & Route Security
+
+- Auth token is maintained in `localStorage` under key `auth_token` and managed by the Pinia `useAuthStore()` (`app/stores/auth.ts`).
+- `app/middleware/auth.global.ts` executes on every client route change:
+  - Initializes token from `localStorage` if not yet loaded.
+  - Blocks unauthenticated access to `/dashboard/**` → redirects to `/login`.
+  - Redirects authenticated users visiting `/login` → to `/dashboard`.
+- Because `/dashboard/**` is client-only (`ssr: false`), SSR never handles auth tokens.
+
+### 5.4 Admin CRUD & Form Patterns
+
+- **Form Structure**: Use `UForm` bound to a Zod schema defined in `<script setup lang="ts">`.
+- **Form Controls**: Use Nuxt UI components: `UFormField`, `UInput`, `UTextarea`, `USelect`, `UButton`.
+- **Slug Generation**:
+  - Automatically derive the slug from the title/name until the user manually modifies the slug field.
+  - Track manual edits using a boolean flag (e.g., `isSlugManual = ref(false)`).
+- **Layout Specification**: All dashboard pages must declare:
+  ```ts
+  definePageMeta({
+    layout: 'dashboard',
+  })
+  ```
+
+### 5.5 Markdown Processing & Authoring
+
+- **Single Markdown Engine**: All markdown rendering must go through `renderMarkdown()` in `app/utils/markdown.ts`.
+- **Security & Sanitization**:
+  - `renderMarkdown()` escapes raw HTML characters (`<`, `>`, `&`, `"`, `'`) before parsing.
+  - Validates link URLs to allow only safe protocols (`http:`, `https:`, `mailto:`, or root-relative `/`).
+  - Do NOT use raw `v-html` on unsanitized user/API input.
+- **Client Markdown Editor**:
+  - `app/components/editor/UmoEditor.client.vue` is a custom-built, toolbar-driven markdown textarea with instant preview mode.
+  - Must remain client-only (has `.client.vue` suffix).
+
+### 5.6 Design System & Styling Tokens
+
+- **Tailwind v4 Integration**: Styles and theme tokens are defined via CSS custom properties in `app/assets/css/main.css`.
+- **Design Tokens**:
+  - Accent palette: `--accent: #19594A`, `--accent-hover: #134238`, `--accent-light: #3B7A57`, `--accent-subtle: rgba(25, 89, 74, 0.06)`, `--accent-glow: rgba(25, 89, 74, 0.12)`.
+  - Neutral surfaces: `--bg-main: #FAFAF8`, `--bg-tint: #F4F5F1`, `--surface-panel: #FFFFFF`, `--surface-subtle: #F5F5F4`.
+  - Typography: `--font-display: 'Fraunces'`, `--font-body: 'Inter'`, `--font-mono: 'JetBrains Mono'`.
+- **Utility Classes**:
+  - Prefer existing classes: `.editorial-heading`, `.editorial-label`, `.card-flat`, `.card-elevated`, `.card-accent`, `.btn-primary`, `.btn-secondary`, `.tag-default`, `.prose`, `.fade-in`, `.expand-grid`.
+  - Avoid ad-hoc inline color overrides; use token-based Tailwind arbitrary values like `bg-[var(--surface-panel)]` or `text-[var(--text-secondary)]`.
+- **Reduced Motion**: All animations must respect `@media (prefers-reduced-motion: reduce)`. Avoid introducing external animation libraries when pure CSS transitions suffice.
+
+### 5.7 Icons & UI Components
+
+- **Icons**: Use `<UIcon name="lucide:<icon-name>" />`.
+- **Icon Bundling**: Explicitly list newly introduced dynamic icon names in `nuxt.config.ts` under `icon.clientBundle.icons` to ensure they are pre-bundled for client rendering.
+- **Component Auto-Imports**:
+  - `Landing*` for `app/components/landing/` (e.g. `LandingHero`, `LandingFeaturedProjects`)
+  - `Content*` for `app/components/content/` (e.g. `ContentPostCard`, `ContentMarkdownView`)
+  - `Dashboard*` for `app/components/dashboard/` (e.g. `DashboardStatCard`, `DashboardResourceTable`)
+  - `Editor*` for `app/components/editor/` (e.g. `EditorUmoEditor`)
+
+---
+
+## 6. Environment Configuration Reference
+
+All application configuration is exposed via Nuxt public runtime config:
+
+| Environment Variable | Default Value | Usage |
 |---|---|---|
-| `NUXT_PUBLIC_API_BASE` | `/api/v1` | Backend API base URL (same-origin via reverse proxy in production) |
-| `NUXT_PUBLIC_SITE_URL` | `https://portfolio.example.com` | Canonical URL for OG tags |
-| `NUXT_PUBLIC_SITE_NAME` | `Portfolio` | Site name in `<title>` |
+| `NUXT_PUBLIC_API_BASE` | `/api/v1` | Base URL for backend API calls |
+| `NUXT_PUBLIC_SITE_URL` | `https://portfolio.example.com` | Canonical root for Open Graph & sitemaps |
+| `NUXT_PUBLIC_SITE_NAME` | `Portfolio` | Branding title suffix in document metadata |
 
-## Code organization
+- **Security Note**: `.env` is git-ignored. Never expose private credentials or API secrets in frontend code; all configuration is public runtime config.
 
-```
-app/
-├── app.vue            # Root: calls ensureProfile() during SSR, wraps NuxtLayout in UApp
-├── app.config.ts      # Nuxt UI theme (primary: emerald, neutral: stone)
-├── assets/css/main.css  # Design tokens (CSS custom properties) + global utility classes
-├── components/
-│   ├── content/       # Public content display (PostCard, ExperienceCard, MarkdownView)
-│   ├── dashboard/     # Admin widgets (StatCard, ResourceTable, ViewsChart)
-│   ├── editor/        # UmoEditor.client.vue — hand-written markdown editor (client-only)
-│   └── landing/       # Landing sections (Hero, FeaturedProjects, RecentPosts, ProjectCard, ExperienceTimeline)
-├── composables/       # API access per resource: useApi, useAuth, usePosts, useProjects,
-│                      # useExperiences, useProfile, useAssets, useStats
-├── layouts/           # default.vue (public), dashboard.vue (admin shell, noindex)
-├── middleware/        # auth.global.ts — global route guard
-├── pages/             # Public pages + dashboard CRUD (list/new/[id]/edit per resource)
-├── stores/            # Pinia: auth, ui
-├── types/api.ts       # Shared API types mirroring backend DTOs
-└── utils/markdown.ts  # renderMarkdown() — shared markdown→HTML renderer
-```
+---
 
-Unit tests live in `tests/` (`tests/**/*.test.ts`, run with `npm test` / `task test`). `Taskfile.yml` (task runner wrappers) and `vitest.config.ts` sit at the repo root.
+## 7. Quality Gates & Security Rules for Agents
 
-## Conventions and patterns
+When creating or modifying code in this repository, you must adhere to the following rules:
 
-### API access
-
-- **Always go through `useApi()`** (`app/composables/useApi.ts`). It is a `$fetch.create` instance that sets `baseURL` from runtime config, attaches the `Authorization: Bearer <token>` header when logged in, and logs out + redirects to `/login` on 401. `credentials: 'include'` is set **only on the client** (it breaks SSR fetch).
-- Resource composables (`usePosts`, `useProjects`, ...) wrap `useApi()` and expose typed methods. Public endpoints are `/blog/...`, `/projects/...`, `/profile`; admin endpoints are `/admin/...`. Follow the existing naming (`adminList`, `adminCreate`, `adminUpdate`, ...).
-- In pages, fetch data with `useAsyncData` (see `app/pages/blog/[slug].vue` and `app/pages/dashboard/index.vue` for the pattern, including `default:` fallbacks for SSR resilience).
-- The site-wide profile is fetched once during SSR via `ensureProfile()` in `app.vue` and shared through `useState` (`useProfileState()`); components must handle a `null` profile gracefully.
-
-### Auth
-
-- JWT access token stored in **`localStorage`** (`auth_token`) via the Pinia auth store; sent as a Bearer header.
-- `app/middleware/auth.global.ts` runs on every navigation: initializes the token from localStorage (client-only), redirects unauthenticated users away from `/dashboard/**`, and authenticated users away from `/login`.
-- Because the dashboard is SPA-only, auth state is entirely client-side; SSR never sees the token.
-
-### Pages and routing
-
-- Dashboard pages opt into the dashboard layout with `definePageMeta({ layout: 'dashboard' })`.
-- Admin CRUD follows a consistent shape per resource: `pages/dashboard/<resource>.vue` (or `<resource>/index.vue`) list view, `<resource>/new.vue` create form, `<resource>/[id]/edit.vue` edit form.
-- Forms use **`UForm` + a zod schema** defined in the page's `<script setup>`, with `UFormField`/`UInput`/`UTextarea`/`USelect`. Slug fields auto-generate from the title until manually edited.
-- Public pages set SEO via `useSeoMeta` + canonical link + JSON-LD (`application/ld+json`); keep this when adding public routes. The dashboard layout sets `robots: noindex, nofollow`.
-
-### Markdown content
-
-- All long-form content is stored as **markdown** in `*Markdown` fields (see `app/types/api.ts`).
-- `renderMarkdown()` in `app/utils/markdown.ts` is the single renderer used by both the editor preview and the public `ContentMarkdownView` component — keep them using this one function. It HTML-escapes first and sanitizes link URL schemes (only `http(s)`, `mailto`, root-relative allowed).
-- `EditorUmoEditor` (`app/components/editor/UmoEditor.client.vue`) is a **custom-built markdown textarea with a toolbar**, not a third-party editor, despite the name (the README's mention of "Umo Editor / Tiptap" is outdated). It is client-only (`.client.vue` suffix).
-
-### Styling
-
-- Design tokens are **CSS custom properties** in `app/assets/css/main.css` (`--accent`, `--bg-main`, `--surface-panel`, `--text-primary`, `--border-subtle`, ...), with a `.dark` override block driven by `@nuxtjs/color-mode` (system preference, light fallback).
-- Prefer these tokens in Tailwind arbitrary values (`bg-[var(--surface-panel)]`, `text-[var(--text-secondary)]`) over hard-coded colors.
-- Reusable utility classes live in `main.css`: `.editorial-heading`, `.editorial-label`, `.card-flat`/`.card-elevated`/`.card-accent`, `.btn-primary`/`.btn-secondary`, `.tag-default`, `.prose`, `.fade-in`. Reuse them instead of inventing new one-off styles.
-- Animations are CSS-only and respect `prefers-reduced-motion`; do not reach for gsap without a reason.
-
-### Icons and components
-
-- Icons use `UIcon` with `lucide:*` names. The client bundle scans source files, and common icons are also explicitly listed in `nuxt.config.ts` `icon.clientBundle.icons` — **add new icon names there** if you introduce ones that scanning might miss (e.g. dynamically constructed names).
-- Components are auto-imported with directory prefixes: `DashboardStatCard`, `EditorUmoEditor`, `ContentMarkdownView`, `LandingHero`, etc. Match this when adding components.
-- Note: `ViewsChart.vue` uses Unovis `Vis*` components (`VisXYContainer`, `VisLine`, `VisAxis`) without an explicit import or plugin registration — verify rendering before refactoring that component.
-
-## Security considerations
-
-- The auth token in `localStorage` is accessible to any JS running on the origin — never render unsanitized HTML. Markdown HTML output must go through `renderMarkdown()` (it escapes HTML and sanitizes URL schemes); do not `v-html` raw user/API content by other means.
-- `.env` files are git-ignored; only `.env.example` is committed. Never commit secrets — this app needs none client-side (all env vars are public).
-- `credentials: 'include'` must stay client-only in `useApi()`; setting it on the server breaks SSR requests.
-- Dashboard routes rely on the global auth middleware — do not bypass `navigateTo('/login')` handling on 401 in `useApi()`.
+1. **Verify Type Safety**: Run `npm run typecheck` (`vue-tsc`) after making changes to ensure zero compiler errors.
+2. **Run the Test Suite**: Run `npm test` (`vitest run`) and confirm all unit/integration tests pass. Update or add corresponding tests under `tests/` when modifying logic.
+3. **Preserve API Contract Alignment**: Never change `app/types/api.ts` without ensuring parity with the Go backend DTOs in `../backend/internal/adapter/handler/dto.go`.
+4. **Preserve Hybrid Route Rules**: Never remove `ssr: false` from `/dashboard/**` or `/login`. Never modify dev proxy rules in `nuxt.config.ts` without testing SSR fetch compatibility.
+5. **Enforce Markdown Sanitization**: Never inject unescaped HTML. All user-authored content must be rendered via `renderMarkdown()`.
