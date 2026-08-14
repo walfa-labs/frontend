@@ -175,6 +175,13 @@ export interface TopPost {
   views: number
 }
 
+// --- Health ---
+
+export interface HealthResponse {
+  status: 'ok' | 'degraded'
+  db: 'up' | 'down'
+}
+
 // --- Auth ---
 // Backend loginResponse returns { accessToken, refreshToken }.
 // Backend refreshResponse returns { accessToken }.

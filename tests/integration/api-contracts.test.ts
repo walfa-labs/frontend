@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ApiResponse, Post, Project, Experience, Profile, StatsSummary } from '../../app/types/api'
+import type { ApiResponse, Experience, HealthResponse, Post, Profile, Project, StatsSummary } from '../../app/types/api'
 
 describe('API Contracts & Type Integrity', () => {
   it('validates Post data contract shape', () => {
@@ -109,4 +109,16 @@ describe('API Contracts & Type Integrity', () => {
     expect(response.data.publishedPosts).toBe(12)
     expect(response.meta?.total).toBe(1)
   })
+
+  it('validates HealthResponse contract shape', () => {
+    const health: HealthResponse = {
+      status: 'ok',
+      db: 'up',
+    }
+
+    expect(health.status).toBe('ok')
+    expect(health.db).toBe('up')
+  })
 })
+
+

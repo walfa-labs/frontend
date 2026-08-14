@@ -5,10 +5,15 @@ const { list } = useProjects()
 const config = useRuntimeConfig()
 const profile = useState<Profile | null>('profile', () => null)
 
+const filter = ref<'all' | 'featured'>('all')
+
 const { data } = await useAsyncData(
   'projects-list',
-  () => list(),
-  { default: () => ({ data: [] }) },
+  () => list(filter.value === 'featured' ? { featured: true } : undefined),
+  {
+    default: () => ({ data: [] }),
+    watch: [filter],
+  },
 )
 
 const projects = computed(() => data.value?.data ?? [])
@@ -40,6 +45,30 @@ useHead({
           <p class="mt-4 text-lg text-[var(--text-secondary)] max-w-2xl">
             A selection of work spanning backend systems, developer tools, and web applications.
           </p>
+
+          <!-- Filter tabs -->
+          <div class="mt-6 flex items-center gap-2">
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs rounded-md font-medium transition-colors cursor-pointer"
+              :class="filter === 'all'
+                ? 'bg-[var(--accent)] text-white'
+                : 'bg-[var(--surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'"
+              @click="filter = 'all'"
+            >
+              All Projects
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs rounded-md font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+              :class="filter === 'featured'
+                ? 'bg-[var(--accent)] text-white'
+                : 'bg-[var(--surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'"
+              @click="filter = 'featured'"
+            >
+              <UIcon name="lucide:star" class="size-3.5" /> Featured
+            </button>
+          </div>
         </div>
       </div>
     </section>

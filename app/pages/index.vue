@@ -9,7 +9,7 @@ const { list: listPosts } = usePosts()
 
 const { data: projectsData } = useAsyncData(
   'home-projects',
-  () => listProjects(),
+  () => listProjects({ featured: true }),
   { default: () => ({ data: [] }) },
 )
 
@@ -203,17 +203,31 @@ useHead({
           <div class="expand-grid" :class="{ open: expandedProject === project.id }">
             <div>
               <div class="px-5 pb-5 pt-0 border-t border-[var(--border-subtle)]">
-                <p v-if="project.descriptionMarkdown" class="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">{{ project.descriptionMarkdown }}</p>
+                <div v-if="project.descriptionMarkdown" class="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
+                  <ContentMarkdownView :content="project.descriptionMarkdown" />
+                </div>
                 <div v-if="project.techStack.length" class="mt-4 flex flex-wrap gap-1.5">
                   <span v-for="tech in project.techStack" :key="tech" class="tag-default">{{ tech }}</span>
                 </div>
-                <div class="mt-4 flex items-center gap-4">
+                <div class="mt-4 flex flex-wrap items-center gap-4">
                   <a v-if="project.repoUrl" :href="project.repoUrl" target="_blank" rel="noopener noreferrer" class="text-sm text-[var(--accent)] hover:underline inline-flex items-center gap-1">
                     <UIcon name="lucide:github" class="size-4" /> Repository
                   </a>
                   <a v-if="project.demoUrl" :href="project.demoUrl" target="_blank" rel="noopener noreferrer" class="text-sm text-[var(--accent)] hover:underline inline-flex items-center gap-1">
                     <UIcon name="lucide:external-link" class="size-4" /> Live Demo
                   </a>
+                  <template v-if="project.links && project.links.length">
+                    <a
+                      v-for="link in project.links"
+                      :key="link.id"
+                      :href="link.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-sm text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+                    >
+                      <UIcon name="lucide:link" class="size-3.5" /> {{ link.label }}
+                    </a>
+                  </template>
                   <NuxtLink :to="`/projects/${project.slug}`" class="text-sm text-[var(--text-tertiary)] hover:text-[var(--accent)] inline-flex items-center gap-1 ml-auto">
                     Full details <UIcon name="lucide:arrow-right" class="size-3.5" />
                   </NuxtLink>

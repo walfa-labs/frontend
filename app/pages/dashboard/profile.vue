@@ -108,9 +108,11 @@ async function handleSave() {
         <UInput v-model="form.location" placeholder="San Francisco, CA" class="w-full" />
       </UFormField>
 
-      <UFormField label="Avatar URL" name="avatarUrl">
-        <UInput v-model="form.avatarUrl" placeholder="https://…" class="w-full" />
-      </UFormField>
+      <DashboardImageUploader
+        v-model="form.avatarUrl"
+        label="Avatar Image"
+        placeholder="https://… or upload avatar"
+      />
 
       <UFormField label="Bio (Markdown)" name="bioMarkdown">
         <UTextarea v-model="form.bioMarkdown" :rows="6" placeholder="Write a short bio about yourself…" class="w-full" />

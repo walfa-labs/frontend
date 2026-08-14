@@ -1,7 +1,11 @@
-import type { ApiResponse, StatsSummary, Tag, TopPost, ViewPoint } from '~/types/api'
+import type { ApiResponse, HealthResponse, StatsSummary, Tag, TopPost, ViewPoint } from '~/types/api'
 
 export function useStats() {
   const api = useApi()
+
+  // GET /health — public liveness & DB connectivity check
+  const health = () =>
+    api<HealthResponse>('/health')
 
   const summary = () =>
     api<ApiResponse<StatsSummary>>('/stats/summary')
@@ -16,5 +20,6 @@ export function useStats() {
   const topPosts = (limit?: number) =>
     api<ApiResponse<TopPost[]>>('/admin/stats/top-posts', { query: { limit } })
 
-  return { summary, tags, views, topPosts }
+  return { health, summary, tags, views, topPosts }
 }
+

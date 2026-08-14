@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
+import type { Profile, Tag } from '~/types/api'
 
 const { list } = usePosts()
+const { tags: fetchTags } = useStats()
 const route = useRoute()
 const config = useRuntimeConfig()
 const profile = useState<Profile | null>('profile', () => null)
@@ -13,6 +14,14 @@ watch(() => route.query.tag, (val) => {
   activeTag.value = (val as string) || undefined
   page.value = 1
 })
+
+const { data: allTagsData } = await useAsyncData(
+  'blog-tags',
+  () => fetchTags(),
+  { default: () => ({ data: [] as Tag[] }) },
+)
+const allTags = computed(() => allTagsData.value?.data ?? [])
+
 const { data } = await useAsyncData(
   'blog-posts',
   () => list({ page: page.value, tag: activeTag.value }),
@@ -61,22 +70,47 @@ useSeoMeta({
           <p class="mt-4 text-lg text-[var(--text-secondary)] max-w-2xl">
             Articles on software engineering, Go, TypeScript, and more.
           </p>
+
+          <!-- Tag chips ribbon (from GET /tags) -->
+          <div v-if="allTags.length" class="mt-6 flex flex-wrap items-center gap-1.5 pt-2">
+            <span class="text-xs text-[var(--text-tertiary)] mr-1">Topics:</span>
+            <button
+              type="button"
+              class="tag-default cursor-pointer border-0 transition-all"
+              :class="!activeTag ? 'bg-[var(--accent)] text-white' : 'opacity-80 hover:opacity-100'"
+              @click="setTag(undefined)"
+            >
+              All
+            </button>
+            <button
+              v-for="tag in allTags"
+              :key="tag.id"
+              type="button"
+              class="tag-default cursor-pointer border-0 transition-all"
+              :class="activeTag === tag.name ? 'bg-[var(--accent)] text-white' : 'opacity-80 hover:opacity-100'"
+              @click="setTag(tag.name)"
+            >
+              {{ tag.name }}
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Posts -->
     <div class="mx-auto max-w-3xl px-6 pb-20">
-      <!-- Tag filter -->
-      <div v-if="activeTag" class="mb-8 flex items-center gap-2">
-        <span class="text-sm text-[var(--text-tertiary)]">Filtering by:</span>
-        <span class="tag-default">{{ activeTag }}</span>
+      <!-- Active Tag filter indicator if not selected from top -->
+      <div v-if="activeTag" class="mb-8 flex items-center justify-between p-3 rounded-lg bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
+        <div class="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+          <UIcon name="lucide:tag" class="size-4 text-[var(--accent)]" />
+          <span>Showing posts tagged with</span>
+          <span class="font-semibold text-[var(--text-primary)]">"{{ activeTag }}"</span>
+        </div>
         <button
-          class="text-[var(--text-tertiary)] hover:text-[var(--accent)] text-sm transition-colors"
-          aria-label="Clear tag filter"
+          class="text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 cursor-pointer"
           @click="setTag(undefined)"
         >
-          <UIcon name="lucide:x" class="size-3.5" />
+          Clear filter <UIcon name="lucide:x" class="size-3.5" />
         </button>
       </div>
 

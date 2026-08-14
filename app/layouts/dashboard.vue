@@ -20,6 +20,12 @@ const colorModeItems = [
   { label: 'Dark', value: 'dark', icon: 'lucide:moon' },
   { label: 'System', value: 'system', icon: 'lucide:monitor' },
 ]
+const { logout } = useAuth()
+
+async function handleLogout() {
+  logout()
+  await navigateTo('/login')
+}
 </script>
 
 <template>
@@ -83,7 +89,7 @@ const colorModeItems = [
             aria-label="Toggle color mode"
           />
         </UDropdownMenu>
-        <UButton to="/" icon="lucide:log-out" variant="ghost" color="neutral" size="sm">
+        <UButton icon="lucide:log-out" variant="ghost" color="neutral" size="sm" @click="handleLogout">
           Logout
         </UButton>
       </header>

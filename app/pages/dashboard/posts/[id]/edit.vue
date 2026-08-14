@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { z } from 'zod'
-import type { PostInput } from '~/types/api'
+import type { PostInput, Tag } from '~/types/api'
 
 definePageMeta({ layout: 'dashboard' })
 
 const { adminCreate, adminUpdate, getById } = usePosts()
+const { tags: fetchTags } = useStats()
 const route = useRoute()
 
 const editing = computed(() => !!route.params.id)
@@ -13,6 +14,14 @@ const postId = computed(() => route.params.id as string | undefined)
 const saving = ref(false)
 const errorMsg = ref<string | null>(null)
 const slugManuallyEdited = ref(false)
+const newTagInput = ref('')
+
+const { data: existingTagsData } = await useAsyncData(
+  'available-tags',
+  () => fetchTags(),
+  { default: () => ({ data: [] as Tag[] }) },
+)
+const existingTags = computed(() => existingTagsData.value?.data ?? [])
 
 const form = reactive({
   title: '',
@@ -49,6 +58,26 @@ const schema = z.object({
   bodyMarkdown: z.string().min(1, 'Content is required'),
   status: z.enum(['draft', 'published']),
 })
+
+function addTag(name: string) {
+  const trimmed = name.trim()
+  if (!trimmed) return
+  if (!form.tags.includes(trimmed)) {
+    form.tags.push(trimmed)
+  }
+  newTagInput.value = ''
+}
+
+function removeTag(tag: string) {
+  form.tags = form.tags.filter(t => t !== tag)
+}
+
+function onTagKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault()
+    addTag(newTagInput.value)
+  }
+}
 
 async function handleSave() {
   saving.value = true
@@ -112,9 +141,68 @@ function generateSlug() {
         <UTextarea v-model="form.excerpt" :rows="2" placeholder="Brief summary…" class="w-full" />
       </UFormField>
 
-      <UFormField label="Cover Image URL" name="coverImageUrl">
-        <UInput v-model="form.coverImageUrl" placeholder="https://…" class="w-full" />
-      </UFormField>
+      <DashboardImageUploader
+        v-model="form.coverImageUrl"
+        label="Cover Image"
+        placeholder="https://… or upload cover image"
+      />
+
+      <!-- Tags selection & input -->
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Tags</label>
+        <div class="space-y-2">
+          <!-- Selected tags -->
+          <div v-if="form.tags.length" class="flex flex-wrap gap-1.5">
+            <span
+              v-for="tag in form.tags"
+              :key="tag"
+              class="tag-default inline-flex items-center gap-1"
+            >
+              {{ tag }}
+              <button type="button" class="hover:text-red-500 cursor-pointer" @click="removeTag(tag)">
+                <UIcon name="lucide:x" class="size-3" />
+              </button>
+            </span>
+          </div>
+
+          <!-- Add new tag input -->
+          <div class="flex gap-2">
+            <UInput
+              v-model="newTagInput"
+              placeholder="Add tag and press Enter…"
+              class="w-full max-w-xs"
+              @keydown="onTagKeydown"
+            />
+            <UButton
+              type="button"
+              variant="outline"
+              color="neutral"
+              size="sm"
+              icon="lucide:plus"
+              @click="addTag(newTagInput)"
+            >
+              Add
+            </UButton>
+          </div>
+
+          <!-- Suggested existing tags -->
+          <div v-if="existingTags.length" class="pt-1">
+            <p class="text-xs text-[var(--text-tertiary)] mb-1.5">Available tags:</p>
+            <div class="flex flex-wrap gap-1.5">
+              <button
+                v-for="tag in existingTags"
+                :key="tag.id"
+                type="button"
+                class="tag-default text-xs cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+                :class="{ 'opacity-100 ring-1 ring-[var(--accent)]': form.tags.includes(tag.name) }"
+                @click="form.tags.includes(tag.name) ? removeTag(tag.name) : addTag(tag.name)"
+              >
+                {{ form.tags.includes(tag.name) ? '✓ ' : '+ ' }}{{ tag.name }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div>
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Content (Markdown)</label>
@@ -141,3 +229,4 @@ function generateSlug() {
     </UForm>
   </div>
 </template>
+

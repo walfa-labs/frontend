@@ -11,6 +11,19 @@ describe('useStats', () => {
     vi.clearAllMocks()
   })
 
+  it('calls health endpoint', async () => {
+    const statsComposable = useStats()
+    mockApi.mockResolvedValueOnce({
+      status: 'ok',
+      db: 'up',
+    })
+
+    const res = await statsComposable.health()
+    expect(mockApi).toHaveBeenCalledWith('/health')
+    expect(res.status).toBe('ok')
+    expect(res.db).toBe('up')
+  })
+
   it('calls summary endpoint', async () => {
     const statsComposable = useStats()
     mockApi.mockResolvedValueOnce({

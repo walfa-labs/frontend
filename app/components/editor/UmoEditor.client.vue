@@ -75,6 +75,10 @@ function insertLink() {
   insertAtCursor(`[${selected}](https://)`)
 }
 
+const { upload } = useAssets()
+const imageInputRef = ref<HTMLInputElement | null>(null)
+const isUploadingImage = ref(false)
+
 function insertImage() {
   const url = window.prompt('Image URL:')
   if (!url) return
@@ -82,11 +86,47 @@ function insertImage() {
   insertAtCursor(`![${alt}](${url})`)
 }
 
+function triggerImageUpload() {
+  imageInputRef.value?.click()
+}
+
+async function handleImageUpload(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  if (file.size > 10 * 1024 * 1024) {
+    window.alert('File size exceeds 10MB limit.')
+    target.value = ''
+    return
+  }
+
+  isUploadingImage.value = true
+  try {
+    const asset = await upload(file)
+    const alt = file.name.replace(/\.[^/.]+$/, '')
+    insertAtCursor(`![${alt}](${asset.url})`)
+  } catch {
+    window.alert('Failed to upload image.')
+  } finally {
+    isUploadingImage.value = false
+    target.value = ''
+  }
+}
+
 const previewHtml = computed(() => renderMarkdown(content.value))
 </script>
 
 <template>
   <div>
+    <!-- Hidden image file input -->
+    <input
+      ref="imageInputRef"
+      type="file"
+      accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+      class="hidden"
+      @change="handleImageUpload"
+    >
     <!-- Toolbar -->
     <div class="flex items-center flex-wrap gap-1 mb-0 px-2 py-1.5 border border-[var(--border-default)] border-b-0 rounded-t-lg bg-[var(--surface-subtle)]">
       <button type="button" @click="wrapSelection('**')" title="Bold" class="toolbar-btn">
@@ -119,8 +159,12 @@ const previewHtml = computed(() => renderMarkdown(content.value))
       <button type="button" @click="insertLink()" title="Link" class="toolbar-btn">
         <UIcon name="lucide:link" class="size-4" />
       </button>
-      <button type="button" @click="insertImage()" title="Image" class="toolbar-btn">
+      <button type="button" @click="insertImage()" title="Insert Image URL" class="toolbar-btn">
         <UIcon name="lucide:image" class="size-4" />
+      </button>
+      <button type="button" :disabled="isUploadingImage" @click="triggerImageUpload()" title="Upload Image File" class="toolbar-btn">
+        <UIcon v-if="!isUploadingImage" name="lucide:upload" class="size-4" />
+        <UIcon v-else name="lucide:refresh-cw" class="size-4 animate-spin" />
       </button>
       <button type="button" @click="insertAtCursor('\n```\n\n```\n')" title="Code block" class="toolbar-btn">
         <UIcon name="lucide:square-code" class="size-4" />

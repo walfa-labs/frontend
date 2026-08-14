@@ -116,9 +116,11 @@ const linkKindItems = [
         <UInput v-model="form.tagline" placeholder="A short one-liner…" class="w-full" />
       </UFormField>
 
-      <UFormField label="Cover Image URL" name="coverImageUrl">
-        <UInput v-model="form.coverImageUrl" placeholder="https://…" class="w-full" />
-      </UFormField>
+      <DashboardImageUploader
+        v-model="form.coverImageUrl"
+        label="Cover Image"
+        placeholder="https://… or upload project cover"
+      />
 
       <div>
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description (Markdown)</label>
