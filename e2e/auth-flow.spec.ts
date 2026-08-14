@@ -19,4 +19,12 @@ test.describe('Authentication & Route Protection Flow', () => {
     await page.goto('/dashboard/projects/new')
     await expect(page).toHaveURL(/\/login/, { timeout: 15000 })
   })
+
+  test('navigates back to home page from login', async ({ page }) => {
+    await page.goto('/login')
+    await expect(page).toHaveURL(/\/login/)
+    
+    await page.getByRole('link', { name: /back to home/i }).click()
+    await expect(page).toHaveURL(/\/$/)
+  })
 })

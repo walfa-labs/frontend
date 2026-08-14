@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { z } from 'zod'
-import type { Profile } from '~/types/api'
 
 definePageMeta({ layout: false })
 
 const { login } = useAuth()
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 const colorMode = useColorMode()
 
 const loading = ref(false)
@@ -44,45 +43,76 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[var(--bg-main)] px-4">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-main)] px-4 py-12">
     <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
-        <h1 class="editorial-heading text-2xl text-[var(--text-primary)]">{{ config.public.siteName }}</h1>
+      <!-- Back to home navigation -->
+      <div class="mb-6">
+        <NuxtLink
+          to="/"
+          class="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors no-underline group"
+          aria-label="Back to home"
+        >
+          <UIcon name="lucide:arrow-left" class="size-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>Back to home</span>
+        </NuxtLink>
       </div>
 
-      <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-        <UFormField label="Username" name="username">
-          <UInput v-model="state.username" placeholder="admin" class="w-full" />
-        </UFormField>
-        <UFormField label="Password" name="password">
-          <UInput v-model="state.password" type="password" placeholder="••••••••" class="w-full" />
-        </UFormField>
+      <div class="card-flat p-6 sm:p-8">
+        <div class="text-center mb-8">
+          <NuxtLink
+            to="/"
+            class="editorial-heading text-2xl text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors no-underline inline-block"
+          >
+            {{ profile?.name || config.public.siteName }}
+          </NuxtLink>
+          <p class="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)] mt-1.5">
+            Admin Sign In
+          </p>
+        </div>
 
-        <p v-if="errorMsg" class="text-sm text-red-500">{{ errorMsg }}</p>
+        <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+          <UFormField label="Username" name="username">
+            <UInput v-model="state.username" placeholder="admin" class="w-full" />
+          </UFormField>
+          <UFormField label="Password" name="password">
+            <UInput v-model="state.password" type="password" placeholder="••••••••" class="w-full" />
+          </UFormField>
 
-        <UButton type="submit" :loading="loading" color="primary" block size="lg">
-          Sign In
-        </UButton>
-      </UForm>
+          <p v-if="errorMsg" class="text-sm text-red-500">{{ errorMsg }}</p>
 
-      <!-- Color mode toggle -->
-      <div v-if="colorMode" class="mt-6 flex justify-center">
-        <UDropdownMenu
-          :items="colorModeItems.map(item => ({
-            label: item.label,
-            icon: item.icon,
-            onSelect: () => colorMode.preference = item.value,
-            class: (colorMode?.preference || 'system') === item.value ? 'text-primary font-semibold' : '',
-          }))"
+          <UButton type="submit" :loading="loading" color="primary" block size="lg">
+            Sign In
+          </UButton>
+        </UForm>
+      </div>
+
+      <!-- Color mode toggle and return link -->
+      <div class="mt-6 flex items-center justify-between px-1 text-xs text-[var(--text-tertiary)]">
+        <NuxtLink
+          to="/"
+          class="hover:text-[var(--accent)] transition-colors no-underline inline-flex items-center gap-1"
         >
-          <UButton
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            :icon="(colorMode?.preference || 'system') === 'dark' ? 'lucide:moon' : (colorMode?.preference || 'system') === 'light' ? 'lucide:sun' : 'lucide:monitor'"
-            aria-label="Toggle color mode"
-          />
-        </UDropdownMenu>
+          &larr; Return to website
+        </NuxtLink>
+
+        <div v-if="colorMode">
+          <UDropdownMenu
+            :items="colorModeItems.map(item => ({
+              label: item.label,
+              icon: item.icon,
+              onSelect: () => colorMode.preference = item.value,
+              class: (colorMode?.preference || 'system') === item.value ? 'text-primary font-semibold' : '',
+            }))"
+          >
+            <UButton
+              variant="ghost"
+              color="neutral"
+              size="xs"
+              :icon="(colorMode?.preference || 'system') === 'dark' ? 'lucide:moon' : (colorMode?.preference || 'system') === 'light' ? 'lucide:sun' : 'lucide:monitor'"
+              aria-label="Toggle color mode"
+            />
+          </UDropdownMenu>
+        </div>
       </div>
     </div>
   </div>
