@@ -48,6 +48,17 @@ export default defineNuxtConfig({
     fallback: 'light',
   },
   devtools: { enabled: true },
+  // Disable @nuxt/fonts auto-downloading — all three typefaces are already
+  // served via the Google Fonts <link> tag declared in app.head above, so
+  // letting @nuxt/fonts also try to download & self-host them causes
+  // intermittent CI failures when Google Fonts CDN URLs return 4xx errors.
+  fonts: {
+    families: [
+      { name: 'Fraunces', provider: 'none' },
+      { name: 'Inter', provider: 'none' },
+      { name: 'JetBrains Mono', provider: 'none' },
+    ],
+  },
   icon: {
     mode: 'svg',
     serverBundle: { collections: ['lucide'] },
