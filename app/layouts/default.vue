@@ -33,7 +33,6 @@ const colorModeItems = [
     >
       <div class="mx-auto max-w-5xl flex items-center justify-between h-16 px-6">
         <NuxtLink to="/" class="editorial-heading text-xl text-[var(--text-primary)] no-underline flex items-center gap-2.5">
-          <span class="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
           {{ profile?.name || config.public.siteName }}
         </NuxtLink>
         <nav class="flex items-center gap-0.5 sm:gap-1 shrink-0">
@@ -78,7 +77,6 @@ const colorModeItems = [
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <NuxtLink to="/" class="editorial-heading text-lg text-[var(--text-primary)] no-underline flex items-center gap-2">
-              <span class="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
               {{ profile?.name || config.public.siteName }}
             </NuxtLink>
             <p class="text-sm text-[var(--text-tertiary)] mt-1">
