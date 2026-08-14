@@ -8,7 +8,7 @@
 [![Vitest](https://img.shields.io/badge/Tested_with-Vitest_4-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Playwright](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Production_Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)](https://unlicense.org/)
 
 A modern, high-performance portfolio and content management frontend built with **Nuxt 4**, **Vue 3.5**, **Nuxt UI v4**, and **Tailwind CSS v4**. Engineered with hybrid rendering (SSR + 1-hour SWR edge caching for public routes, client-only SPA for the authenticated dashboard), bespoke editorial design tokens, comprehensive testing suites, and hardened containerization.
 
@@ -355,4 +355,4 @@ docker run -d \
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is dedicated to the public domain under the [Unlicense](https://unlicense.org/) — see the [LICENSE](LICENSE) file for details.
