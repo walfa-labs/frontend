@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import type { Experience } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 defineProps<{
   experiences: Experience[]
 }>()
-
-function formatDate(date: string | null): string {
-  if (!date) return 'Present'
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
-}
 </script>
 
 <template>
@@ -22,7 +18,7 @@ function formatDate(date: string | null): string {
       <span class="timeline-dot" aria-hidden="true" />
       <div class="card-flat p-5 md:p-6">
         <p class="text-xs font-mono text-[var(--accent)]">
-          {{ formatDate(exp.startDate) }} — {{ formatDate(exp.endDate) }}
+          {{ formatDate(exp.startDate, 'yearMonth') }} — {{ formatDate(exp.endDate, 'yearMonth', 'Present') }}
         </p>
         <h3 class="mt-1.5 text-base font-semibold text-[var(--text-primary)]">{{ exp.roleTitle }}</h3>
         <p class="text-sm text-[var(--text-secondary)]">

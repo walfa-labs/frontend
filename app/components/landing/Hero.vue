@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
-
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 const config = useRuntimeConfig()
 </script>
 
 <template>
-  <section class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-transparent" />
-    <UContainer class="relative py-24 md:py-32">
-      <div class="max-w-3xl">
-        <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-highlighted">
+  <section class="hero-bg border-b border-[var(--border-subtle)]">
+    <div class="mx-auto max-w-5xl px-6 py-20 md:py-28">
+      <div>
+        <p class="editorial-label mb-4">Engineer</p>
+        <h1 class="editorial-heading text-[clamp(2.5rem,6vw,4rem)] text-[var(--text-primary)]">
           Hi, I'm {{ profile?.name || config.public.siteName }}
         </h1>
-        <p class="mt-6 text-xl text-muted leading-relaxed">
+        <p class="mt-6 text-lg md:text-xl text-[var(--text-secondary)] leading-relaxed max-w-2xl">
           {{ profile?.tagline || 'Software engineer building fast, reliable systems with Go and TypeScript.' }}
         </p>
-        <div class="mt-8 flex gap-4">
-          <UButton to="/projects" size="lg" color="primary">
+        <div class="mt-8 flex flex-wrap gap-4">
+          <NuxtLink to="/projects" class="btn-primary no-underline">
+            <UIcon name="lucide:folder-git-2" class="size-4" />
             View Projects
-          </UButton>
-          <UButton to="/blog" size="lg" variant="outline" color="neutral">
+          </NuxtLink>
+          <NuxtLink to="/blog" class="btn-secondary no-underline">
+            <UIcon name="lucide:book-open" class="size-4" />
             Read Blog
-          </UButton>
+          </NuxtLink>
         </div>
       </div>
-    </UContainer>
+    </div>
   </section>
 </template>

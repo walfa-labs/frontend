@@ -1,39 +1,30 @@
 <script setup lang="ts">
 import type { PostSummary } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 defineProps<{
   post: PostSummary
 }>()
-
-function formatDate(date: string | null): string {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
 </script>
 
 <template>
   <NuxtLink
     :to="`/blog/${post.slug}`"
-    class="block p-6 rounded-lg border border-default hover:border-primary transition-colors"
+    class="card-elevated p-6 block no-underline group"
   >
-    <h3 class="text-xl font-semibold text-highlighted">{{ post.title }}</h3>
-    <p v-if="post.excerpt" class="mt-2 text-muted line-clamp-2">{{ post.excerpt }}</p>
+    <h3 class="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{{ post.title }}</h3>
+    <p v-if="post.excerpt" class="mt-2 text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed">{{ post.excerpt }}</p>
     <div class="mt-4 flex items-center justify-between">
-      <div class="flex flex-wrap gap-2">
-        <UBadge
+      <div class="flex flex-wrap gap-1.5">
+        <span
           v-for="tag in post.tags"
           :key="tag.id"
-          :label="tag.name"
-          color="primary"
-          variant="soft"
-          size="sm"
-        />
+          class="tag-default"
+        >
+          {{ tag.name }}
+        </span>
       </div>
-      <time class="text-sm text-muted">{{ formatDate(post.publishedAt) }}</time>
+      <time class="text-xs text-[var(--text-tertiary)] font-mono">{{ formatDate(post.publishedAt) }}</time>
     </div>
   </NuxtLink>
 </template>

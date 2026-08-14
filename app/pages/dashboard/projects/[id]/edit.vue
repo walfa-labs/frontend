@@ -34,21 +34,23 @@ const { data } = await useAsyncData(
 )
 
 const project = computed(() => data.value?.data)
-if (project.value) {
-  form.title = project.value.title
-  form.slug = project.value.slug
-  form.tagline = project.value.tagline
-  form.descriptionMarkdown = project.value.descriptionMarkdown
-  form.coverImageUrl = project.value.coverImageUrl
-  form.repoUrl = project.value.repoUrl
-  form.demoUrl = project.value.demoUrl
-  form.techStack = [...project.value.techStack]
-  form.status = project.value.status
-  form.featured = project.value.featured
-  form.sortOrder = project.value.sortOrder
-  form.links = project.value.links.map(l => ({ label: l.label, url: l.url, kind: l.kind }))
-  techStackInput.value = form.techStack.join(', ')
-}
+watchEffect(() => {
+  if (project.value) {
+    form.title = project.value.title ?? ''
+    form.slug = project.value.slug ?? ''
+    form.tagline = project.value.tagline ?? ''
+    form.descriptionMarkdown = project.value.descriptionMarkdown ?? ''
+    form.coverImageUrl = project.value.coverImageUrl ?? ''
+    form.repoUrl = project.value.repoUrl ?? ''
+    form.demoUrl = project.value.demoUrl ?? ''
+    form.techStack = project.value.techStack ? [...project.value.techStack] : []
+    form.status = project.value.status ?? 'draft'
+    form.featured = project.value.featured ?? false
+    form.sortOrder = project.value.sortOrder ?? 0
+    form.links = (project.value.links ?? []).map(l => ({ label: l.label, url: l.url, kind: l.kind }))
+    techStackInput.value = form.techStack.join(', ')
+  }
+})
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -76,8 +78,12 @@ async function handleSave() {
     await adminUpdate(projectId.value, payload)
     await navigateTo('/dashboard/projects')
   } catch (err: unknown) {
-    const error = err as { data?: { error?: { message?: string } } }
-    errorMsg.value = error?.data?.error?.message ?? 'Failed to save project.'
+    const error = err as { data?: { error?: { message?: string; details?: Array<{ field: string; issue: string }> } } }
+    if (error?.data?.error?.details?.length) {
+      errorMsg.value = error.data.error.details.map(d => `${d.field}: ${d.issue}`).join(', ')
+    } else {
+      errorMsg.value = error?.data?.error?.message ?? 'Failed to save project.'
+    }
   } finally {
     saving.value = false
   }

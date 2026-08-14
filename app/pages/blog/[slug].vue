@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 const route = useRoute()
 const { getBySlug } = usePosts()
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 
 const slug = computed(() => route.params.slug as string)
 
@@ -46,11 +46,6 @@ useHead({
     }),
   }] : [],
 })
-
-function formatDate(date: string | null): string {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-}
 </script>
 
 <template>
@@ -58,7 +53,7 @@ function formatDate(date: string | null): string {
     <template v-if="post">
       <!-- Header -->
       <section class="hero-bg">
-        <div class="mx-auto max-w-3xl px-6 pt-16 pb-12 md:pt-20 md:pb-16">
+        <div class="mx-auto max-w-5xl px-6 pt-16 pb-12 md:pt-20 md:pb-16">
           <NuxtLink to="/blog" class="text-sm text-[var(--text-tertiary)] hover:text-[var(--accent)] transition-colors no-underline inline-flex items-center gap-1 mb-8">
             <UIcon name="lucide:arrow-left" class="size-4" /> Back to blog
           </NuxtLink>
@@ -87,7 +82,7 @@ function formatDate(date: string | null): string {
       </section>
 
       <!-- Body -->
-      <div class="mx-auto max-w-3xl px-6 py-16">
+      <div class="mx-auto max-w-5xl px-6 py-16">
         <div class="prose prose-lg max-w-none text-[var(--text-secondary)]">
           <ContentMarkdownView :content="post.bodyMarkdown" />
         </div>

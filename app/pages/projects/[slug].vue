@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
-
 const route = useRoute()
 const { getBySlug } = useProjects()
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 
 const slug = computed(() => route.params.slug as string)
 
@@ -38,7 +36,7 @@ useHead({
     <template v-if="project">
       <!-- Header -->
       <section class="hero-bg">
-        <div class="mx-auto max-w-3xl px-6 pt-16 pb-12 md:pt-20 md:pb-16">
+        <div class="mx-auto max-w-5xl px-6 pt-16 pb-12 md:pt-20 md:pb-16">
           <NuxtLink to="/projects" class="text-sm text-[var(--text-tertiary)] hover:text-[var(--accent)] transition-colors no-underline inline-flex items-center gap-1 mb-8">
             <UIcon name="lucide:arrow-left" class="size-4" /> Back to projects
           </NuxtLink>
@@ -68,7 +66,7 @@ useHead({
       </section>
 
       <!-- Body -->
-      <div class="mx-auto max-w-3xl px-6 py-16">
+      <div class="mx-auto max-w-5xl px-6 py-16">
         <div class="prose prose-lg max-w-none text-[var(--text-secondary)]">
           <ContentMarkdownView :content="project.descriptionMarkdown" />
         </div>

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import type { Profile, Tag } from '~/types/api'
+import type { Tag } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 const { list } = usePosts()
 const { tags: fetchTags } = useStats()
 const route = useRoute()
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 
 const page = ref(1)
 const activeTag = ref<string | undefined>((route.query.tag as string) || undefined)
@@ -41,11 +42,6 @@ function setTag(tag: string | undefined) {
   page.value = 1
 }
 
-function formatDate(date: string | null): string {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-}
-
 useSeoMeta({
   title: `Blog — ${profile.value?.name || config.public.siteName}`,
   description: 'Articles on software engineering, Go, TypeScript, and more.',
@@ -54,6 +50,11 @@ useSeoMeta({
   ogType: 'website',
   ogUrl: `${config.public.siteUrl}/blog`,
   twitterCard: 'summary_large_image',
+  twitterTitle: `Blog — ${profile.value?.name || config.public.siteName}`,
+  twitterDescription: 'Articles on software engineering, Go, TypeScript, and more.',
+})
+useHead({
+  link: [{ rel: 'canonical', href: `${config.public.siteUrl}/blog` }],
 })
 </script>
 
@@ -61,7 +62,7 @@ useSeoMeta({
   <div>
     <!-- Header -->
     <section class="hero-bg">
-      <div class="mx-auto max-w-3xl px-6 pt-16 pb-12 md:pt-24 md:pb-16">
+      <div class="mx-auto max-w-5xl px-6 pt-16 pb-12 md:pt-24 md:pb-16">
         <div>
           <p class="editorial-label mb-4">Writing</p>
           <h1 class="editorial-heading text-[clamp(2rem,5vw,3.5rem)] text-[var(--text-primary)]">
@@ -98,7 +99,7 @@ useSeoMeta({
     </section>
 
     <!-- Posts -->
-    <div class="mx-auto max-w-3xl px-6 pb-20">
+    <div class="mx-auto max-w-5xl px-6 pb-20">
       <!-- Active Tag filter indicator if not selected from top -->
       <div v-if="activeTag" class="mb-8 flex items-center justify-between p-3 rounded-lg bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
         <div class="flex items-center gap-2 text-sm text-[var(--text-secondary)]">

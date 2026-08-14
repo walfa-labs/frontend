@@ -40,15 +40,17 @@ if (editing.value && postId.value) {
     () => getById(postId.value!),
   )
   const post = computed(() => data.value?.data)
-  if (post.value) {
-    form.title = post.value.title
-    form.slug = post.value.slug
-    form.excerpt = post.value.excerpt
-    form.bodyMarkdown = post.value.bodyMarkdown
-    form.coverImageUrl = post.value.coverImageUrl
-    form.status = post.value.status
-    form.tags = post.value.tags.map((t) => t.name)
-  }
+  watchEffect(() => {
+    if (post.value) {
+      form.title = post.value.title ?? ''
+      form.slug = post.value.slug ?? ''
+      form.excerpt = post.value.excerpt ?? ''
+      form.bodyMarkdown = post.value.bodyMarkdown ?? ''
+      form.coverImageUrl = post.value.coverImageUrl ?? ''
+      form.status = post.value.status ?? 'draft'
+      form.tags = (post.value.tags ?? []).map((t) => t.name)
+    }
+  })
 }
 
 const schema = z.object({
@@ -58,6 +60,14 @@ const schema = z.object({
   bodyMarkdown: z.string().min(1, 'Content is required'),
   status: z.enum(['draft', 'published']),
 })
+
+function slugifyTag(name: string) {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || name.trim().toLowerCase()
+}
 
 function addTag(name: string) {
   const trimmed = name.trim()
@@ -86,11 +96,14 @@ async function handleSave() {
     const payload: PostInput = {
       title: form.title,
       slug: form.slug,
-      excerpt: form.excerpt,
+      excerpt: form.excerpt || '',
       bodyMarkdown: form.bodyMarkdown,
-      coverImageUrl: form.coverImageUrl,
+      coverImageUrl: form.coverImageUrl || '',
       status: form.status,
-      tags: form.tags.map((name) => ({ name, slug: name.toLowerCase().replace(/\s+/g, '-') })),
+      tags: form.tags.map((name) => ({
+        name: name.trim(),
+        slug: slugifyTag(name),
+      })),
     }
     if (editing.value && postId.value) {
       await adminUpdate(postId.value, payload)
@@ -99,8 +112,12 @@ async function handleSave() {
     }
     await navigateTo('/dashboard/posts')
   } catch (err: unknown) {
-    const error = err as { data?: { error?: { message?: string } } }
-    errorMsg.value = error?.data?.error?.message ?? 'Failed to save post.'
+    const error = err as { data?: { error?: { message?: string; details?: Array<{ field: string; issue: string }> } } }
+    if (error?.data?.error?.details?.length) {
+      errorMsg.value = error.data.error.details.map(d => `${d.field}: ${d.issue}`).join(', ')
+    } else {
+      errorMsg.value = error?.data?.error?.message ?? 'Failed to save post.'
+    }
   } finally {
     saving.value = false
   }

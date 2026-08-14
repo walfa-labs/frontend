@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 const { list: listProjects } = useProjects()
 const { list: listExperiences } = useExperiences()
 const { list: listPosts } = usePosts()
@@ -34,11 +34,6 @@ const expandedProject = ref<string | null>(null)
 
 function toggleProject(id: string) {
   expandedProject.value = expandedProject.value === id ? null : id
-}
-
-function formatDate(date: string | null): string {
-  if (!date) return 'Present'
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
 }
 
 useSeoMeta({
@@ -265,7 +260,7 @@ useHead({
             <p v-if="post.excerpt" class="mt-1 text-sm text-[var(--text-secondary)] line-clamp-1">{{ post.excerpt }}</p>
           </div>
           <time v-if="post.publishedAt" class="text-xs text-[var(--text-tertiary)] whitespace-nowrap shrink-0 font-mono">
-            {{ formatDate(post.publishedAt) }}
+            {{ formatDate(post.publishedAt, 'yearMonth') }}
           </time>
         </NuxtLink>
       </div>

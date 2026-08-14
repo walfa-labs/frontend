@@ -31,18 +31,20 @@ const { data } = await useAsyncData(
 )
 
 const experience = computed(() => data.value?.data)
-if (experience.value) {
-  form.experienceType = experience.value.experienceType
-  form.organization = experience.value.organization
-  form.roleTitle = experience.value.roleTitle
-  form.location = experience.value.location
-  form.startDate = experience.value.startDate
-  form.endDate = experience.value.endDate ?? ''
-  form.current = experience.value.current
-  form.summaryMarkdown = experience.value.summaryMarkdown
-  form.sortOrder = experience.value.sortOrder
-  form.highlights = experience.value.highlights.map((h) => ({ bodyMarkdown: h.bodyMarkdown, sortOrder: h.sortOrder }))
-}
+watchEffect(() => {
+  if (experience.value) {
+    form.experienceType = experience.value.experienceType
+    form.organization = experience.value.organization ?? ''
+    form.roleTitle = experience.value.roleTitle ?? ''
+    form.location = experience.value.location ?? ''
+    form.startDate = experience.value.startDate ?? ''
+    form.endDate = experience.value.endDate ?? ''
+    form.current = experience.value.current ?? false
+    form.summaryMarkdown = experience.value.summaryMarkdown ?? ''
+    form.sortOrder = experience.value.sortOrder ?? 0
+    form.highlights = (experience.value.highlights ?? []).map((h) => ({ bodyMarkdown: h.bodyMarkdown, sortOrder: h.sortOrder }))
+  }
+})
 
 const schema = z.object({
   organization: z.string().min(1, 'Organization is required'),
@@ -69,8 +71,12 @@ async function handleSave() {
     await adminUpdate(experienceId.value, payload)
     await navigateTo('/dashboard/experiences')
   } catch (err: unknown) {
-    const error = err as { data?: { error?: { message?: string } } }
-    errorMsg.value = error?.data?.error?.message ?? 'Failed to save experience.'
+    const error = err as { data?: { error?: { message?: string; details?: Array<{ field: string; issue: string }> } } }
+    if (error?.data?.error?.details?.length) {
+      errorMsg.value = error.data.error.details.map(d => `${d.field}: ${d.issue}`).join(', ')
+    } else {
+      errorMsg.value = error?.data?.error?.message ?? 'Failed to save experience.'
+    }
   } finally {
     saving.value = false
   }

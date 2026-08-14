@@ -24,10 +24,6 @@ async function handleDelete(row: Experience) {
   await adminDelete(row.id)
   await refresh()
 }
-
-function handleEdit(row: Experience) {
-  navigateTo(`/dashboard/experiences/${row.id}/edit`)
-}
 </script>
 
 <template>
@@ -40,7 +36,6 @@ function handleEdit(row: Experience) {
       :columns="columns"
       :rows="rows"
       @delete="handleDelete"
-      @edit="handleEdit"
     >
       <template #cell-organization="{ row }">
         <NuxtLink :to="`/dashboard/experiences/${row.id}/edit`" class="text-[var(--accent)] hover:underline">

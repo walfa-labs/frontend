@@ -24,10 +24,6 @@ async function handleDelete(row: Project) {
   await adminDelete(row.id)
   await refresh()
 }
-
-function handleEdit(row: Project) {
-  navigateTo(`/dashboard/projects/${row.id}/edit`)
-}
 </script>
 
 <template>
@@ -40,7 +36,6 @@ function handleEdit(row: Project) {
       :columns="columns"
       :rows="rows"
       @delete="handleDelete"
-      @edit="handleEdit"
     >
       <template #cell-title="{ row }">
         <NuxtLink :to="`/dashboard/projects/${row.id}/edit`" class="text-[var(--accent)] hover:underline">{{ row.title }}</NuxtLink>

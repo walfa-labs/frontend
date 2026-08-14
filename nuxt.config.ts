@@ -65,7 +65,7 @@ export default defineNuxtConfig({
     clientBundle: {
       scan: true,
       icons: [
-        'lucide:activity', 'lucide:arrow-left', 'lucide:arrow-right', 'lucide:arrow-up-right',
+        'lucide:activity', 'lucide:alert-triangle', 'lucide:arrow-left', 'lucide:arrow-right', 'lucide:arrow-up-right',
         'lucide:bold', 'lucide:book-open', 'lucide:briefcase', 'lucide:building-2',
         'lucide:calendar', 'lucide:check', 'lucide:chevron-down', 'lucide:chevron-right',
         'lucide:code', 'lucide:database', 'lucide:external-link', 'lucide:eye', 'lucide:file-text',

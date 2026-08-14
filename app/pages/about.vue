@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 const { list } = useExperiences()
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 
 const { data } = useAsyncData(
   'experiences',
@@ -18,11 +18,6 @@ const educationExperiences = computed(() =>
   (data.value?.data ?? []).filter((e) => e.experienceType === 'education'),
 )
 
-function formatDate(date: string | null): string {
-  if (!date) return 'Present'
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
-}
-
 useSeoMeta({
   title: `About — ${profile.value?.name || config.public.siteName}`,
   description: 'Professional experience and education timeline.',
@@ -31,6 +26,11 @@ useSeoMeta({
   ogType: 'website',
   ogUrl: `${config.public.siteUrl}/about`,
   twitterCard: 'summary_large_image',
+  twitterTitle: `About — ${profile.value?.name || config.public.siteName}`,
+  twitterDescription: 'Professional experience and education timeline.',
+})
+useHead({
+  link: [{ rel: 'canonical', href: `${config.public.siteUrl}/about` }],
 })
 </script>
 
@@ -75,8 +75,8 @@ useSeoMeta({
           >
             <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
               <div class="md:w-32 shrink-0">
-                <p class="text-sm font-medium text-[var(--accent)]">{{ formatDate(exp.startDate) }}</p>
-                <p class="text-sm text-[var(--text-tertiary)]">{{ formatDate(exp.endDate) }}</p>
+                <p class="text-sm font-medium text-[var(--accent)]">{{ formatDate(exp.startDate, 'yearMonth') }}</p>
+                <p class="text-sm text-[var(--text-tertiary)]">{{ formatDate(exp.endDate, 'yearMonth', 'Present') }}</p>
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="text-lg font-semibold text-[var(--text-primary)]">{{ exp.roleTitle }}</h3>
@@ -112,8 +112,8 @@ useSeoMeta({
           >
             <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
               <div class="md:w-32 shrink-0">
-                <p class="text-sm font-medium text-[var(--accent)]">{{ formatDate(exp.startDate) }}</p>
-                <p class="text-sm text-[var(--text-tertiary)]">{{ formatDate(exp.endDate) }}</p>
+                <p class="text-sm font-medium text-[var(--accent)]">{{ formatDate(exp.startDate, 'yearMonth') }}</p>
+                <p class="text-sm text-[var(--text-tertiary)]">{{ formatDate(exp.endDate, 'yearMonth', 'Present') }}</p>
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="text-lg font-semibold text-[var(--text-primary)]">{{ exp.roleTitle }}</h3>

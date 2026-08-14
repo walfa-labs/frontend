@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Post } from '~/types/api'
+import { formatDate } from '~/utils/date'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -28,10 +29,6 @@ async function handleDelete(row: Post) {
   await refresh()
 }
 
-function handleEdit(row: Post) {
-  navigateTo(`/dashboard/posts/${row.id}/edit`)
-}
-
 async function togglePublish(row: Post) {
   togglingId.value = row.id
   try {
@@ -41,15 +38,6 @@ async function togglePublish(row: Post) {
   } finally {
     togglingId.value = null
   }
-}
-
-function formatDate(val: string | null): string {
-  if (!val) return '—'
-  return new Date(val).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
 }
 </script>
 
@@ -63,7 +51,6 @@ function formatDate(val: string | null): string {
       :columns="columns"
       :rows="rows"
       @delete="handleDelete"
-      @edit="handleEdit"
     >
       <template #cell-title="{ row }">
         <NuxtLink :to="`/dashboard/posts/${row.id}/edit`" class="text-[var(--accent)] hover:underline font-medium">
@@ -101,7 +88,7 @@ function formatDate(val: string | null): string {
         </button>
       </template>
       <template #cell-publishedAt="{ row }">
-        {{ formatDate(row.publishedAt) }}
+        {{ formatDate(row.publishedAt, 'short', '—') }}
       </template>
     </DashboardResourceTable>
   </div>

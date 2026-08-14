@@ -9,24 +9,23 @@ defineProps<{
 <template>
   <NuxtLink
     :to="`/projects/${project.slug}`"
-    class="block p-6 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-colors no-underline group"
+    class="card-accent p-6 block no-underline group"
   >
     <div class="flex items-start justify-between gap-3">
       <h3 class="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
         {{ project.title }}
       </h3>
-      <UBadge v-if="project.featured" icon="lucide:star" color="primary" variant="soft" size="sm" />
+      <UIcon v-if="project.featured" name="lucide:star" class="text-[var(--accent)] shrink-0 mt-0.5" />
     </div>
-    <p v-if="project.tagline" class="mt-2 text-[var(--text-secondary)] text-sm">{{ project.tagline }}</p>
+    <p v-if="project.tagline" class="mt-2 text-[var(--text-secondary)] text-sm leading-relaxed">{{ project.tagline }}</p>
     <div v-if="project.techStack.length" class="mt-4 flex flex-wrap gap-1.5">
-      <UBadge
+      <span
         v-for="tech in project.techStack"
         :key="tech"
-        :label="tech"
-        color="neutral"
-        variant="soft"
-        size="sm"
-      />
+        class="tag-default"
+      >
+        {{ tech }}
+      </span>
     </div>
   </NuxtLink>
 </template>

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/api'
-
 const { list } = useProjects()
 const config = useRuntimeConfig()
-const profile = useState<Profile | null>('profile', () => null)
+const profile = useProfileState()
 
 const filter = ref<'all' | 'featured'>('all')
 
@@ -26,6 +24,8 @@ useSeoMeta({
   ogType: 'website',
   ogUrl: `${config.public.siteUrl}/projects`,
   twitterCard: 'summary_large_image',
+  twitterTitle: `Projects — ${profile.value?.name || config.public.siteName}`,
+  twitterDescription: 'A collection of projects I have built.',
 })
 useHead({
   link: [{ rel: 'canonical', href: `${config.public.siteUrl}/projects` }],
